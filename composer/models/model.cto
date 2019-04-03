@@ -1,0 +1,109 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace com.stockchainz.net
+
+// Seller represents a seller
+participant Seller identified by sellerID {
+  o String sellerID
+  o String name
+}
+
+// Buyer represents a buyer
+participant Buyer identified by buyerID {
+  o String buyerID
+  o String name
+}
+
+// Item represents an item sold by the seller
+asset Item identified by itemID {
+  o String itemID
+  o String name
+  o String description optional
+  --> Seller seller
+  o Integer amount default = 0
+}
+
+// Inventory attaches to a single item
+asset Inventory identified by invID {
+  o String invID
+  --> Item item
+  o InventoryDelta[] changes
+}
+
+enum SaleStatus {
+  o UNCONFIRMED
+  o CONFIRMED
+}
+
+// Sale represents a sale transaction.
+asset Sale identified by saleID {
+  o String saleID
+  --> Item item
+  --> Buyer buyer
+  o Integer amount range=[1,]
+  o SaleStatus status default="UNCONFIRMED"
+}
+
+// DeltaType represents item transaction types
+enum DeltaType {
+  o SALE
+  o RESTOCK
+}
+
+// InventoryDelta represents changes to the inventory
+concept InventoryDelta {
+  o Integer amount
+  o DeltaType type
+}
+
+// CreateItem creates an item asset
+transaction CreateItem {
+  o String name
+  o String description optional
+}
+
+// PlaceOrder creates a Sale instance
+transaction PlaceOrder {
+  --> Item item
+  o Integer amount
+}
+
+// ConfirmSale confirms a Sale
+transaction ConfirmSale {
+  --> Sale sale
+}
+
+// RestockItem invokes an item restock
+transaction RestockItem {
+  --> Item item
+  o Integer amount range=[1,]
+}
+
+// UpdateItem updates an item
+transaction UpdateItem {
+  --> Item item
+  o String newName optional
+  o String newDescription optional
+}
+
+// DeleteItem deletes an existing item
+transaction DeleteItem {
+  --> Item item
+}
+
+// TransactionEvent represents events resulting from any item transaction
+event TransactionEvent {
+  o String message
+}

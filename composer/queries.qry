@@ -1,0 +1,31 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+query queryItem {
+  description: "Queries an item's information based on its item ID"
+  statement: 
+    SELECT com.stockchainz.net.Item WHERE (itemID == _$id)
+}
+
+query queryInventory {
+  description: "Queries an item's inventory history based on its item ID"
+  statement:
+    SELECT com.stockchainz.net.Inventory WHERE (item == _$item)
+}
+
+query queryBySeller {
+  description: "Queries items sold by the specified seller"
+  statement:
+    SELECT com.stockchainz.net.Item WHERE (seller == _$seller)
+}
