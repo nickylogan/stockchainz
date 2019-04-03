@@ -1,0 +1,92 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: "2"
+
+services:
+  orderer.stockchainz.com:
+    container_name: orderer.stockchainz.com
+    image: hyperledger/fabric-orderer:$IMAGE_TAG
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=DEBUG
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../crypto-config/ordererOrganizations/stockchainz.com/orderers/orderer.stockchainz.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/stockchainz.com/orderers/orderer.stockchainz.com/tls/:/var/hyperledger/orderer/tls
+      - orderer.stockchainz.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+
+  peer0.market1.stockchainz.com:
+    container_name: peer0.market1.stockchainz.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.market1.stockchainz.com
+      - CORE_PEER_ADDRESS=peer0.market1.stockchainz.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.market1.stockchainz.com:7051
+      - CORE_PEER_LOCALMSPID=Market1MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/market1.stockchainz.com/peers/peer0.market1.stockchainz.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/market1.stockchainz.com/peers/peer0.market1.stockchainz.com/tls:/etc/hyperledger/fabric/tls
+      - peer0.market1.stockchainz.com:/var/hyperledger/production
+    ports:
+      - 7051:7051
+      - 7053:7053
+
+  peer0.market2.stockchainz.com:
+    container_name: peer0.market2.stockchainz.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.market2.stockchainz.com
+      - CORE_PEER_ADDRESS=peer0.market2.stockchainz.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.market2.stockchainz.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=
+      - CORE_PEER_LOCALMSPID=Market2MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/market2.stockchainz.com/peers/peer0.market2.stockchainz.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/market2.stockchainz.com/peers/peer0.market2.stockchainz.com/tls:/etc/hyperledger/fabric/tls
+      - peer0.market2.stockchainz.com:/var/hyperledger/production
+    ports:
+      - 8051:7051
+      - 8053:7053
+
+  peer0.market3.stockchainz.com:
+    container_name: peer0.market3.stockchainz.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.market3.stockchainz.com
+      - CORE_PEER_ADDRESS=peer0.market3.stockchainz.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.market3.stockchainz.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=
+      - CORE_PEER_LOCALMSPID=Market3MSP
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/market3.stockchainz.com/peers/peer0.market3.stockchainz.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/market3.stockchainz.com/peers/peer0.market3.stockchainz.com/tls:/etc/hyperledger/fabric/tls
+      - peer0.market3.stockchainz.com:/var/hyperledger/production
+    ports:
+      - 9051:7051
+      - 9053:7053

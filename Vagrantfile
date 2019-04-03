@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
   # VirtualBox configuration
   config.vm.provider "virtualbox" do |vb|
     # Increase memory allocated to vm (for build tasks)
-    vb.memory = 6192
+    vb.memory = 4096
   end
 
   # Install prereqs

@@ -1,0 +1,177 @@
+---
+Organizations:
+    - &OrdererOrg
+      Name: OrdererOrg
+      ID: OrdererMSP
+      MSPDir: crypto-config/ordererOrganizations/stockchainz.com/msp
+      Policies:
+          Readers:
+              Type: Signature
+              Rule: "OR('OrdererMSP.member')"
+          Writers:
+              Type: Signature
+              Rule: "OR('OrdererMSP.member')"
+          Admins:
+              Type: Signature
+              Rule: "OR('OrdererMSP.admin')"
+
+    - &Market1
+      Name: Market1MSP
+      ID: Market1MSP
+      MSPDir: crypto-config/peerOrganizations/market1.stockchainz.com/msp
+      Policies:
+          Readers:
+              Type: Signature
+              Rule: "OR('Market1MSP.admin', 'Market1MSP.peer', 'Market1MSP.client')"
+          Writers:
+              Type: Signature
+              Rule: "OR('Market1MSP.admin', 'Market1MSP.client')"
+          Admins:
+              Type: Signature
+              Rule: "OR('Market1MSP.admin')"
+
+      AnchorPeers:
+          - Host: peer0.market1.stockchainz.com
+            Port: 7051
+
+    - &Market2
+      Name: Market2MSP
+      ID: Market2MSP
+      MSPDir: crypto-config/peerOrganizations/market2.stockchainz.com/msp
+      Policies:
+          Readers:
+              Type: Signature
+              Rule: "OR('Market2MSP.admin', 'Market2MSP.peer', 'Market2MSP.client')"
+          Writers:
+              Type: Signature
+              Rule: "OR('Market2MSP.admin', 'Market2MSP.client')"
+          Admins:
+              Type: Signature
+              Rule: "OR('Market2MSP.admin')"
+      AnchorPeers:
+          - Host: peer0.market2.stockchainz.com
+            Port: 7051
+
+    - &Market3
+      Name: Market3MSP
+      ID: Market3MSP
+      MSPDir: crypto-config/peerOrganizations/market3.stockchainz.com/msp
+      Policies:
+          Readers:
+              Type: Signature
+              Rule: "OR('Market3MSP.admin', 'Market3MSP.peer', 'Market3MSP.client')"
+          Writers:
+              Type: Signature
+              Rule: "OR('Market3MSP.admin', 'Market3MSP.client')"
+          Admins:
+              Type: Signature
+              Rule: "OR('Market3MSP.admin')"
+      AnchorPeers:
+          - Host: peer0.market3.stockchainz.com
+            Port: 7051
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_3: true
+
+    Orderer: &OrdererCapabilities
+        V1_1: true
+
+    Application: &ApplicationCapabilities
+        V1_3: true
+        V1_2: false
+        V1_1: false
+
+Application: &ApplicationDefaults
+    Organizations:
+
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+    OrdererType: solo
+
+    Addresses:
+        - orderer.stockchainz.com:7050
+
+    BatchTimeout: 2s
+
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+
+    Kafka:
+        Brokers:
+            - 127.0.0.1:9092
+
+    Organizations:
+
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    StockchainzNetGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            StockchainzMarketplaceConsortium:
+                Organizations:
+                    - *Market1
+                    - *Market2
+                    - *Market3
+
+    StockchainzChannel:
+        Consortium: StockchainzMarketplaceConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Market1
+                - *Market2
+                - *Market3
+            Capabilities:
+                <<: *ApplicationCapabilities

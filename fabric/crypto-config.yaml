@@ -1,0 +1,50 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# ---------------------------------------------------------------------------
+# "OrdererOrgs" - Definition of organizations managing orderer nodes
+# ---------------------------------------------------------------------------
+OrdererOrgs:
+  # ---------------------------------------------------------------------------
+  # Orderer
+  # ---------------------------------------------------------------------------
+  - Name: Orderer
+    Domain: stockchainz.com
+    Specs:
+      - Hostname: orderer
+# ---------------------------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+# ---------------------------------------------------------------------------
+PeerOrgs:
+  # ---------------------------------------------------------------------------
+  # Market1
+  # ---------------------------------------------------------------------------
+  - Name: Market1
+    Domain: market1.stockchainz.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 3
+  # ---------------------------------------------------------------------------
+  # Market2:
+  # ---------------------------------------------------------------------------
+  - Name: Market2
+    Domain: market2.stockchainz.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 3
+  # ---------------------------------------------------------------------------
+  # Market3:
+  # ---------------------------------------------------------------------------
+  - Name: Market3
+    Domain: market3.stockchainz.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 3
