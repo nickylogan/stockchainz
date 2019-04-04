@@ -55,8 +55,8 @@ services:
     environment:
       - GOPATH=/opt/gopath
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-      - FABRIC_LOGGING_SPEC=DEBUG
-      # - FABRIC_LOGGING_SPEC=INFO
+      - CORE_LOGGING_SPEC=DEBUG
+      # - CORE_LOGGING_SPEC=INFO
       - CORE_PEER_ID=cli
       - CORE_PEER_ADDRESS=peer0.market1.stockchainz.com:7051
       - CORE_PEER_LOCALMSPID=Market1MSP
@@ -69,7 +69,7 @@ services:
     command: /bin/bash
     volumes:
       - /var/run/:/host/var/run/
-      - ./../test_chaincode/:/opt/gopath/src/github.com/chaincode/
+      - ./test_chaincode/:/opt/gopath/src/github.com/chaincode/
       - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
       - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
       - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts

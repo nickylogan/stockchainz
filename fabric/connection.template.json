@@ -1,0 +1,103 @@
+{
+    "name": "stockchainz-net",
+    "x-type": "hlfv1",
+    "version": "1.0.0",
+    "peers": {
+        "peer0.market1.stockchainz.com": {
+            "url": "grpc://localhost:7051",
+            "tlsCACerts" : {
+                "pem": "INSERT_MARKET1_CA_CERT"
+            }
+        },
+        "peer0.market2.stockchainz.com": {
+            "url": "grpc://localhost:8051",
+            "tlsCACerts" : {
+                "pem": "INSERT_MARKET2_CA_CERT"
+            }
+        },
+        "peer0.market3.stockchainz.com": {
+            "url": "grpc://localhost:9051",
+            "tlsCACerts" : {
+                "pem": "INSERT_MARKET3_CA_CERT"
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "ca.market1.stockchainz.com": {
+            "url": "http://localhost:7054",
+            "caName": "ca_peerMarket1"
+        },
+        "ca.market2.stockchainz.com": {
+            "url": "http://localhost:8054",
+            "caName": "ca_peerMarket2"
+        },
+        "ca.market3.stockchainz.com": {
+            "url": "http://localhost:9054",
+            "caName": "ca_peerMarket3"
+        }
+    },
+    "orderers": {
+        "orderer.stockchainz.com": {
+            "url": "grpc://localhost:7050",
+            "grpcOptions": {
+                "ssl-target-name-override": "orderer.stockchainz.com"
+            },
+            "tlsCACerts": {
+                "pem": "INSERT_ORDERER_CA_CERT"
+            }
+        }
+    },
+    "organizations": {
+        "Market1": {
+            "mspid": "Market1MSP",
+            "peers": [
+                "peer0.market1.stockchainz.com"
+            ],
+            "certificateAuthorities": [
+                "ca.market1.stockchainz.com"
+            ]
+        },
+        "Market2": {
+            "mspid": "Market2MSP",
+            "peers": [
+                "peer0.market2.stockchainz.com"
+            ],
+            "certificateAuthorities": [
+                "ca.market2.stockchainz.com"
+            ]
+        },
+        "Market3": {
+            "mspid": "Market3MSP",
+            "peers": [
+                "peer0.market3.stockchainz.com"
+            ],
+            "certificateAuthorities": [
+                "ca.market3.stockchainz.com"
+            ]
+        }
+    },
+    "channels": {
+        "invchannel": {
+            "orderers": [
+                "orderer.stockchainz.com"
+            ],
+            "peers": {
+                "peer0.market1.stockchainz.com": {
+                    "endorsingPeer": true,
+                    "chaincodeQuery": true,
+                    "eventSource": true
+                },
+                "peer0.market2.stockchainz.com": {
+                    "endorsingPeer": true,
+                    "chaincodeQuery": true,
+                    "eventSource": true
+                },
+                "peer0.market3.stockchainz.com": {
+                    "endorsingPeer": true,
+                    "chaincodeQuery": true,
+                    "eventSource": true
+                }
+            }
+        }
+    }
+}

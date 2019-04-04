@@ -10,7 +10,7 @@ services:
     container_name: orderer.stockchainz.com
     image: hyperledger/fabric-orderer:$IMAGE_TAG
     environment:
-      - ORDERER_GENERAL_LOGLEVEL=DEBUG
+      - CORE_LOGGING_SPEC=DEBUG
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
       - ORDERER_GENERAL_GENESISMETHOD=file
       - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block

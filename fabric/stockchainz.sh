@@ -230,19 +230,11 @@ function generateChannelArtifacts() {
 }
 
 function networkStop() {
-  docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH stop
-  
-  if [ "${IF_CAS}" == "1" ]; then
-    docker-compose -f $COMPOSE_FILE_CAS stop
-  fi
+  docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CAS stop
 }
 
 function networkStart() {
-  docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH start
-
-  if [ "${IF_CAS}" == "1" ]; then
-    docker-compose -f $COMPOSE_FILE_CAS start
-  fi
+  docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CAS start
 }
 
 # timeout duration - the duration the CLI should wait for a response from
@@ -263,6 +255,8 @@ COMPOSE_FILE_CAS=docker-compose-cas.yaml
 LANGUAGE=golang
 # default image tag
 IMAGETAG="latest"
+# default consensus type
+CONSENSUS_TYPE="solo"
 
 # Parse commandline args
 if [ "$1" = "-m" ]; then # supports old usage, muscle memory is powerful!

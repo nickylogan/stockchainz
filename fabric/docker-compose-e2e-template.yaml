@@ -67,10 +67,10 @@ services:
       - stockchainz
 
   orderer.stockchainz.com:
+    container_name: orderer.stockchainz.com
     extends:
       file: base/docker-compose-base.yaml
       service: orderer.stockchainz.com
-    container_name: orderer.stockchainz.com
     networks:
       - stockchainz
 

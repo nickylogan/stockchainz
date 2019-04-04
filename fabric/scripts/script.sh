@@ -46,10 +46,10 @@ createChannel() {
 }
 
 joinChannel() {
-	for org in 1 2 3; do
+	for market in 1 2 3; do
 		peer=0
-		joinChannelWithRetry $peer $org
-		echo "===================== peer${peer}.market${org} joined channel '$CHANNEL_NAME' ===================== "
+		joinChannelWithRetry $peer $market
+		echo "===================== peer${peer}.market${market} joined channel '$CHANNEL_NAME' ===================== "
 		sleep $DELAY
 		echo
 	done
@@ -63,7 +63,7 @@ createChannel
 echo "Having all peers join the channel..."
 joinChannel
 
-## Set the anchor peers for each org in the channel
+## Set the anchor peers for each market in the channel
 echo "Updating anchor peers for market1..."
 updateAnchorPeers 0 1
 echo "Updating anchor peers for market2..."
@@ -71,33 +71,31 @@ updateAnchorPeers 0 2
 echo "Updating anchor peers for market2..."
 updateAnchorPeers 0 3
 
-## Install chaincode on peer0.market1, peer0.market2, and peer0.market3
+## Install chaincode on peer0.market1 and peer0.market2
 echo "Installing chaincode on peer0.market1..."
 installChaincode 0 1
 echo "Installing chaincode on peer0.market2..."
 installChaincode 0 2
+
+# Instantiate chaincode on peer0.market2
+echo "Instantiating chaincode on peer0.market2..."
+instantiateChaincode 0 2
+
+# Query chaincode on peer0.market1
+echo "Querying chaincode on peer0.market1..."
+chaincodeQuery 0 1 100
+
+# Invoke chaincode on peer0.market1 and peer0.market2
+echo "Sending invoke transaction on peer0.market1 peer0.market2..."
+chaincodeInvoke 0 1 0 2
+
+## Install chaincode on peer0.market3
 echo "Installing chaincode on peer0.market3..."
 installChaincode 0 3
 
-# Instantiate chaincode on peer0.market3
-echo "Instantiating chaincode on peer0.market3..."
-instantiateChaincode 0 3
-
-# Query chaincode on peer0.org1
-echo "Querying chaincode on peer0.org1..."
-chaincodeQuery 0 1 100
-
-# Invoke chaincode on peer0.org1 and peer0.org2
-echo "Sending invoke transaction on peer0.org1 peer0.org2..."
-chaincodeInvoke 0 1 0 2
-
-## Install chaincode on peer1.org2
-echo "Installing chaincode on peer1.org2..."
-installChaincode 1 2
-
-# Query on chaincode on peer1.org2, check if the result is 90
-echo "Querying chaincode on peer1.org2..."
-chaincodeQuery 1 2 90
+# Query on chaincode on peer0.market3, check if the result is 90
+echo "Querying chaincode on peer1.market2..."
+chaincodeQuery 0 3 90
 
 echo
 echo "========= All GOOD, stockchainz e2e execution completed =========== "
