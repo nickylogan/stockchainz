@@ -3,7 +3,7 @@
     "composer": "^0.20.8"
   },
   "name": "stockchainz",
-  "version": "0.0.14",
+  "version": "0.1.0",
   "description": "Inventory management implemented on Hyperledger Composer",
   "scripts": {
     "archive": "mkdir -p ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/stockchainz.bna",

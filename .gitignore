@@ -13,11 +13,13 @@
 
 fabric-samples/
 
-/fabric/channel-artifacts/*.tx
-/fabric/channel-artifacts/*.block
-/fabric/crypto-config/*
-/fabric/docker-compose-e2e.yaml
-/fabric/docker-compose-cas.yaml
-/fabric/docker-compose-ca3.yaml
-/fabric/ledgers
-/fabric/ledgers-backup
+/composer/fabric/channel-artifacts/*.tx
+/composer/fabric/channel-artifacts/*.block
+/composer/fabric/crypto-config/*
+/composer/fabric/docker-compose-e2e.yaml
+/composer/fabric/docker-compose-cas.yaml
+/composer/fabric/docker-compose-ca3.yaml
+/composer/fabric/ledgers
+/composer/fabric/ledgers-backup
+/composer/cards/
+/composer/connection-*.json

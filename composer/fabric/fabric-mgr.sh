@@ -1,19 +1,19 @@
 #!/bin/bash
 
-export PATH=${PWD}/../bin:${PWD}:$PATH
+export PATH=${PWD}/bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=${PWD}
 export VERBOSE=false
 
 function printHelp() {
   echo "Usage: "
-  echo "  stockchainz.sh <mode>"
+  echo "  fabric-mgr.sh <mode> [-v <version>]"
   echo "    <mode> - one of 'up', 'down', 'restart', 'generate' or 'destroy'"
   echo "      - 'up' - bring up the network with docker-compose up"
   echo "      - 'down' - bring down the network with docker-compose down"
   echo "      - 'restart' - restart the network"
   echo "      - 'generate' - generate required certificates and genesis block"
   echo "      - 'destroy' - clear the network with docker-compose down"
-  echo "  stockchainz.sh -h (print this message)"
+  echo "  fabric-mgr.sh -h (print this message)"
 }
 
 function askProceed() {
@@ -59,7 +59,8 @@ function networkUp() {
     generateChannelArtifacts
   fi
 
-  IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CAS up -d 2>&1
+  IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_CAS -f $COMPOSE_FILE_COUCH up -d 2>&1
+  
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Unable to start network"
     exit 1
@@ -122,7 +123,8 @@ function replacePrivateKey() {
 }
 
 function generateCerts() {
-  if [ ! -f ./bin/cryptogen ]; then
+  which cryptogen
+  if [ "$?" -ne 0 ]; then
     echo "cryptogen tool not found. exiting"
     exit 1
   fi
@@ -135,7 +137,7 @@ function generateCerts() {
     rm -Rf crypto-config
   fi
   set -x
-  ./bin/cryptogen generate --config=./crypto-config.yaml
+  cryptogen generate --config=./crypto-config.yaml
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -146,7 +148,8 @@ function generateCerts() {
 }
 
 function generateChannelArtifacts() {
-  if [ ! -f ./bin/configtxgen ]; then
+  which configtxgen
+  if [ "$?" -ne 0 ]; then
     echo "configtxgen tool not found. exiting"
     exit 1
   fi
@@ -157,7 +160,7 @@ function generateChannelArtifacts() {
   echo "CONSENSUS_TYPE="$CONSENSUS_TYPE
   set -x
   if [ "$CONSENSUS_TYPE" == "solo" ]; then
-    ./bin/configtxgen -profile StockchainzNetGenesis \
+    configtxgen -profile StockchainzNetGenesis \
       -channelID stockchainz-sys-channel -outputBlock ./channel-artifacts/genesis.block
   else
     set +x
@@ -175,7 +178,7 @@ function generateChannelArtifacts() {
   echo "### Generating channel configuration transaction 'channel.tx' ###"
   echo "#################################################################"
   set -x
-  ./bin/configtxgen -profile StockchainzChannel -outputCreateChannelTx \
+  configtxgen -profile StockchainzChannel -outputCreateChannelTx \
     ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
   res=$?
   set +x
@@ -189,7 +192,7 @@ function generateChannelArtifacts() {
   echo "#######    Generating anchor peer update for Market1MSP   #######"
   echo "#################################################################"
   set -x
-  ./bin/configtxgen -profile StockchainzChannel -outputAnchorPeersUpdate \
+  configtxgen -profile StockchainzChannel -outputAnchorPeersUpdate \
     ./channel-artifacts/Market1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Market1MSP
   res=$?
   set +x
@@ -203,7 +206,7 @@ function generateChannelArtifacts() {
   echo "#######    Generating anchor peer update for Market2MSP   #######"
   echo "#################################################################"
   set -x
-  ./bin/configtxgen -profile StockchainzChannel -outputAnchorPeersUpdate \
+  configtxgen -profile StockchainzChannel -outputAnchorPeersUpdate \
     ./channel-artifacts/Market2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Market2MSP
   res=$?
   set +x
@@ -218,7 +221,7 @@ function generateChannelArtifacts() {
   echo "#######    Generating anchor peer update for Market3MSP   #######"
   echo "#################################################################"
   set -x
-  ./bin/configtxgen -profile StockchainzChannel -outputAnchorPeersUpdate \
+  configtxgen -profile StockchainzChannel -outputAnchorPeersUpdate \
     ./channel-artifacts/Market3MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Market3MSP
   res=$?
   set +x
@@ -236,6 +239,8 @@ function networkStop() {
 function networkStart() {
   docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CAS start
 }
+
+
 
 # timeout duration - the duration the CLI should wait for a response from
 # another container before giving up

@@ -39,7 +39,7 @@ services:
     environment:
       - CORE_PEER_ID=peer0.market1.stockchainz.com
       - CORE_PEER_ADDRESS=peer0.market1.stockchainz.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.market1.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.market1.stockchainz.com:7051
       - CORE_PEER_LOCALMSPID=Market1MSP
     volumes:
@@ -60,7 +60,7 @@ services:
       - CORE_PEER_ID=peer0.market2.stockchainz.com
       - CORE_PEER_ADDRESS=peer0.market2.stockchainz.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.market2.stockchainz.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.market2.stockchainz.com:7051
       - CORE_PEER_LOCALMSPID=Market2MSP
     volumes:
       - /var/run/:/host/var/run/
@@ -80,7 +80,7 @@ services:
       - CORE_PEER_ID=peer0.market3.stockchainz.com
       - CORE_PEER_ADDRESS=peer0.market3.stockchainz.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.market3.stockchainz.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.market3.stockchainz.com:7051
       - CORE_PEER_LOCALMSPID=Market3MSP
     volumes:
       - /var/run/:/host/var/run/
