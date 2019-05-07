@@ -1,5 +1,5 @@
 {
-    "name": "stockchainz-net",
+    "name": "stockchainz-network",
     "x-type": "hlfv1",
     "version": "1.0.0",
     "client": {
@@ -7,11 +7,11 @@
         "connection": {
             "timeout": {
                 "peer": {
-                    "endorser": "1200",
-                    "eventHub": "1200",
-                    "eventReg": "1200"
+                    "endorser": "300",
+                    "eventHub": "300",
+                    "eventReg": "300"
                 },
-                "orderer": "1200"
+                "orderer": "300"
             }
         }
     },
@@ -82,19 +82,28 @@
     "peers": {
         "peer0.market1.stockchainz.com": {
             "url": "grpcs://localhost:7051",
-            "tlsCACerts" : {
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.market1.stockchainz.com"
+            },
+            "tlsCACerts": {
                 "pem": "INSERT_MARKET1_CA_CERT"
             }
         },
         "peer0.market2.stockchainz.com": {
             "url": "grpcs://localhost:8051",
-            "tlsCACerts" : {
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.market2.stockchainz.com"
+            },
+            "tlsCACerts": {
                 "pem": "INSERT_MARKET2_CA_CERT"
             }
         },
         "peer0.market3.stockchainz.com": {
             "url": "grpcs://localhost:9051",
-            "tlsCACerts" : {
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.market3.stockchainz.com"
+            },
+            "tlsCACerts": {
                 "pem": "INSERT_MARKET3_CA_CERT"
             }
         }
@@ -105,6 +114,9 @@
             "caName": "ca-market1",
             "httpOptions": {
                 "verify": false
+            },
+            "tlsCACerts": {
+                "pem": "INSERT_CA1_CA_CERT"
             }
         },
         "ca.market2.stockchainz.com": {
@@ -112,6 +124,9 @@
             "caName": "ca-market2",
             "httpOptions": {
                 "verify": false
+            },
+            "tlsCACerts": {
+                "pem": "INSERT_CA2_CA_CERT"
             }
         },
         "ca.market3.stockchainz.com": {
@@ -119,6 +134,9 @@
             "caName": "ca-market3",
             "httpOptions": {
                 "verify": false
+            },
+            "tlsCACerts": {
+                "pem": "INSERT_CA3_CA_CERT"
             }
         }
     }

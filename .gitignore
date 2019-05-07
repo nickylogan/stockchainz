@@ -13,6 +13,7 @@
 
 fabric-samples/
 
+/composer/first-network/
 /composer/fabric/channel-artifacts/*.tx
 /composer/fabric/channel-artifacts/*.block
 /composer/fabric/crypto-config/*
@@ -22,4 +23,5 @@ fabric-samples/
 /composer/fabric/ledgers
 /composer/fabric/ledgers-backup
 /composer/cards/
+/composer/identities/
 /composer/connection-*.json

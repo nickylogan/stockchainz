@@ -13,52 +13,47 @@ function printHelp() {
 }
 
 function createConnectionProfile() {
-    MARKET=$1
+    ORG=$1
     echo "+-----------------------------------------------------------+"
-    echo "|          Creating connection profile for market${MARKET}          |"
+    echo "|           Creating connection profile for org${ORG}            |"
     echo "+-----------------------------------------------------------+"
-    CONNECTION_PROFILE=connection-market${MARKET}.json
+    CONNECTION_PROFILE=connection-org${ORG}.json
     cp connection.template.json $CONNECTION_PROFILE
 
     CURRENT_DIR=$PWD
     
-    for m in 1 2 3; do
-        cd "${DIR}"/fabric/crypto-config/peerOrganizations/market${m}.stockchainz.com/peers/peer0.market${m}.stockchainz.com/tls
+    for orgg in 1 2 3; do
+        cd "${DIR}"/first-network/crypto-config/peerOrganizations/org${orgg}.example.com/peers/peer0.org${orgg}.example.com/tls
         CERT=$(awk 'NF {sub(/\r/, ""); printf "%s\\\\n",$0;}' ca.crt)
         cd "$CURRENT_DIR"
-        sed -i "s|INSERT_MARKET${m}_CA_CERT|${CERT}|g" $CONNECTION_PROFILE
-        
-        cd "${DIR}"/fabric/crypto-config/peerOrganizations/market${m}.stockchainz.com/ca/
-        CERT=$(awk 'NF {sub(/\r/, ""); printf "%s\\\\n",$0;}' *.pem)
-        cd "$CURRENT_DIR"
-        sed -i "s|INSERT_CA${m}_CA_CERT|${CERT}|g" $CONNECTION_PROFILE
+        sed -i "s|INSERT_ORG${orgg}_CA_CERT|${CERT}|g" $CONNECTION_PROFILE
     done
 
-    cd "${DIR}"/fabric/crypto-config/ordererOrganizations/stockchainz.com/orderers/orderer.stockchainz.com/tls
+    cd "${DIR}"/first-network/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls
     CERT=$(awk 'NF {sub(/\r/, ""); printf "%s\\\\n",$0;}' ca.crt)
     cd "$CURRENT_DIR"
     sed -i "s|INSERT_ORDERER_CA_CERT|${CERT}|g" $CONNECTION_PROFILE
 
-    sed -i "s/INSERT_MARKET_NAME/Market${MARKET}/g" $CONNECTION_PROFILE
+    sed -i "s/INSERT_ORG_NAME/Org${ORG}/g" $CONNECTION_PROFILE
 
-    echo "==== Connection profile for market${MARKET} successfully created ===="
+    echo "==== Connection profile for org${ORG} successfully created ===="
     echo
 }
 
 function createCard() {
-    MARKET=$1
-    CONNECTION_PROFILE=connection-market${MARKET}.json
+    ORG=$1
+    CONNECTION_PROFILE=connection-org${ORG}.json
 
-    MSP_DIR="${DIR}"/fabric/crypto-config/peerOrganizations/market${MARKET}.stockchainz.com/users/Admin@market${MARKET}.stockchainz.com/msp
+    MSP_DIR="${DIR}"/first-network/crypto-config/peerOrganizations/org${ORG}.example.com/users/Admin@org${ORG}.example.com/msp
     CERT="${MSP_DIR}"/signcerts/A*.pem
     PRIV_KEY="${MSP_DIR}"/keystore/*_sk
 
-    CARD_NAME=PeerAdmin@stockchainz-market${MARKET}
+    CARD_NAME=PeerAdmin@example-org${ORG}
 
     mkdir -p "${DIR}"/cards
 
     echo "+-----------------------------------------------------------+"
-    echo "|        Creating PeerAdmin@stockchainz-market${MARKET} card        |"
+    echo "|          Creating PeerAdmin@example-org${ORG} card         |"
     echo "+-----------------------------------------------------------+"
     echo
     composer card create -p $CONNECTION_PROFILE -u PeerAdmin -c $CERT -k $PRIV_KEY \
@@ -68,16 +63,16 @@ function createCard() {
         echo "Failed to generate card ${CARD_NAME}..."
         exit 1
     fi
-    echo "====== PeerAdmin@stockchainz-market${MARKET}.card successfully created ======"
+    echo "====== PeerAdmin@example-org${ORG}.card successfully created ======"
     echo
 }
 
 function import() {
-    MARKET=$1
-    CARD_NAME=PeerAdmin@stockchainz-market${MARKET}
+    ORG=$1
+    CARD_NAME=PeerAdmin@example-org${ORG}
 
     echo "+-----------------------------------------------------------+"
-    echo "|       Importing PeerAdmin@stockchainz-market${MARKET} card        |"
+    echo "|         Importing PeerAdmin@example-org${ORG} card         |"
     echo "+-----------------------------------------------------------+"
     echo
     composer card import -f "${DIR}"/cards/${CARD_NAME}.card --card ${CARD_NAME}
@@ -86,7 +81,7 @@ function import() {
         echo "Failed to import card ${CARD_NAME}..."
         exit 1
     fi
-    echo "====== PeerAdmin@stockchainz-market${MARKET}.card successfully imported ====="
+    echo "====== PeerAdmin@example-org${ORG}.card successfully imported ====="
     echo
 }
 
@@ -110,14 +105,14 @@ function checkPrereqs() {
 }
 
 function generate() {
-    if [ ! -d "${DIR}"/fabric/crypto-config ]; then
+    if [ ! -d "${DIR}"/first-network/crypto-config ]; then
         echo "crypto-config not found. Run './fabric-mgr.sh generate' first"
         exit 1
     fi
 
-    for market in 1 2 3; do
-        createConnectionProfile $market
-        createCard $market
+    for org in 1 2 3; do
+        createConnectionProfile $org
+        createCard $org
     done
 
     echo
@@ -129,8 +124,8 @@ function bootstrap() {
         generate
     fi
 
-    for m in 1 2 3; do
-        import $m
+    for org in 1 2 3; do
+        import $org
     done
 
     echo
@@ -138,8 +133,8 @@ function bootstrap() {
 }
 
 function clear() {
-    for market in 1 2 3; do
-        CARD_NAME=PeerAdmin@stockchainz-market${market}
+    for org in 1 2 3; do
+        CARD_NAME=PeerAdmin@example-org${org}
         if composer card list -c ${CARD_NAME} >/dev/null; then
             composer card delete -c ${CARD_NAME}
             res=$?

@@ -29,14 +29,14 @@ function install() {
         fi
     done
 
-    set -x
-    composer network upgrade -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION}
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-        echo "Error upgrading network ${NET_NAME} to version ${VERSION}. Exiting..."
-        exit 1
-    fi
+    # set -x
+    # composer network upgrade -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION}
+    # res=$?
+    # set +x
+    # if [ $res -ne 0 ]; then
+    #     echo "Error upgrading network ${NET_NAME} to version ${VERSION}. Exiting..."
+    #     exit 1
+    # fi
 }
 
 function start() {

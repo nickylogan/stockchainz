@@ -34,7 +34,7 @@ function askProceed() {
 }
 
 function clearContainers() {
-  CONTAINER_IDS=$(docker ps -a | awk '($2 ~ /dev-peer.*.invcc.*/) {print $1}')
+  CONTAINER_IDS=$(docker ps -a | awk '($2 ~ /dev-peer.*.testcc.*/) {print $1}')
   if [ -z "$CONTAINER_IDS" -o "$CONTAINER_IDS" == " " ]; then
     echo "---- No containers available for deletion ----"
   else
@@ -43,7 +43,7 @@ function clearContainers() {
 }
 
 function removeUnwantedImages() {
-  DOCKER_IMAGE_IDS=$(docker images | awk '($1 ~ /dev-peer.*.invcc.*/) {print $3}')
+  DOCKER_IMAGE_IDS=$(docker images | awk '($1 ~ /dev-peer.*.testcc.*/) {print $3}')
   if [ -z "$DOCKER_IMAGE_IDS" -o "$DOCKER_IMAGE_IDS" == " " ]; then
     echo "---- No images available for deletion ----"
   else
@@ -157,16 +157,10 @@ function generateChannelArtifacts() {
   echo "##########################################################"
   echo "#########  Generating Orderer Genesis block ##############"
   echo "##########################################################"
-  echo "CONSENSUS_TYPE="$CONSENSUS_TYPE
+  
   set -x
-  if [ "$CONSENSUS_TYPE" == "solo" ]; then
-    configtxgen -profile StockchainzNetGenesis \
-      -channelID stockchainz-sys-channel -outputBlock ./channel-artifacts/genesis.block
-  else
-    set +x
-    echo "unrecognized CONSESUS_TYPE='$CONSENSUS_TYPE'. exiting"
-    exit 1
-  fi
+  configtxgen -profile StockchainzOrdererGenesis \
+    -outputBlock ./channel-artifacts/genesis.block
   res=$?
   set +x
   if [ $res -ne 0 ]; then
