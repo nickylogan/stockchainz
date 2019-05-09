@@ -14,6 +14,7 @@
 fabric-samples/
 
 /composer/first-network/
+
 /composer/fabric/channel-artifacts/*.tx
 /composer/fabric/channel-artifacts/*.block
 /composer/fabric/crypto-config/*
@@ -22,6 +23,10 @@ fabric-samples/
 /composer/fabric/docker-compose-ca3.yaml
 /composer/fabric/ledgers
 /composer/fabric/ledgers-backup
+
 /composer/cards/
 /composer/identities/
 /composer/connection-*.json
+/composer/*.card
+
+/composer/rest-server/.env

@@ -1,0 +1,88 @@
+version: "2"
+
+networks: 
+  stockchainz:
+    external: 
+      name: net_stockchainz
+
+services:
+  mongo.api.market1.com:
+    container_name: mongo.api.market1.com
+    image: mongo
+    networks:
+      - stockchainz
+    ports:
+      - 27071:27071
+  
+  api.market1.com:
+    container_name: api.market1.com
+    image: stockchainz/composer-rest-server
+    environment:
+      COMPOSER_CARD: restadmin1@stockchainz
+      COMPOSER_NAMESPACES: never
+      COMPOSER_AUTHENTICATION: 'true'
+      COMPOSER_MULTIUSER: 'true'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID1","clientSecret":"$GOOGLE_OAUTH_SECRET1","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"/","failureRedirect":"/"}}'
+      COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market1.com"}}'
+    volumes: 
+      - ~/.composer:/home/composer/.composer
+    networks: 
+      - stockchainz
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongo.api.market1.com
+  
+  mongo.api.market2.com:
+    container_name: mongo.api.market2.com
+    image: mongo
+    networks:
+      - stockchainz
+    ports:
+      - 37071:27071
+  
+  api.market2.com:
+    container_name: api.market2.com
+    image: stockchainz/composer-rest-server
+    environment:
+      COMPOSER_CARD: restadmin2@stockchainz
+      COMPOSER_NAMESPACES: never
+      COMPOSER_AUTHENTICATION: 'true'
+      COMPOSER_MULTIUSER: 'true'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID2","clientSecret":"$GOOGLE_OAUTH_SECRET2","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"/","failureRedirect":"/"}}'
+      COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market2.com"}}'
+    volumes: 
+      - ~/.composer:/home/composer/.composer
+    networks: 
+      - stockchainz
+    ports:
+      - 4000:3000
+    depends_on: 
+      - mongo.api.market2.com
+  
+  mongo.api.market3.com:
+    container_name: mongo.api.market3.com
+    image: mongo
+    networks:
+      - stockchainz
+    ports:
+      - 47071:27071
+  
+  api.market3.com:
+    container_name: api.market3.com
+    image: stockchainz/composer-rest-server
+    environment:
+      COMPOSER_CARD: restadmin3@stockchainz
+      COMPOSER_NAMESPACES: never
+      COMPOSER_AUTHENTICATION: 'true'
+      COMPOSER_MULTIUSER: 'true'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID3","clientSecret":"$GOOGLE_OAUTH_SECRET3","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"/","failureRedirect":"/"}}'
+      COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market3.com"}}'
+    volumes: 
+      - ~/.composer:/home/composer/.composer
+    networks: 
+      - stockchainz
+    ports:
+      - 5000:3000
+    depends_on: 
+      - mongo.api.market2.com

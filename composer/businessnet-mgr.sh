@@ -9,7 +9,8 @@ VERSION=$( node -p -e "require('../business-network/package.json').version" )
 function printHelp() {
     echo "Usage: "
     echo "  businessnet-mgr.sh <mode>"
-    echo "    <mode> - one of 'install', 'start'"
+    echo "    <mode> - one of 'request', 'install', 'start'"
+    echo "      - 'request' - requests peer admin cards"
     echo "      - 'install' - installs the business network archive"
     echo "      - 'start' - spins up the business network"
     echo
@@ -28,18 +29,9 @@ function install() {
             exit 1
         fi
     done
-
-    # set -x
-    # composer network upgrade -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION}
-    # res=$?
-    # set +x
-    # if [ $res -ne 0 ]; then
-    #     echo "Error upgrading network ${NET_NAME} to version ${VERSION}. Exiting..."
-    #     exit 1
-    # fi
 }
 
-function start() {
+function requestPeerAdminCards() {
     for market in 1 2 3; do
         CARD_NAME=PeerAdmin@stockchainz-market${market}
         echo "Requesting identity of ${CARD_NAME}"
@@ -53,29 +45,16 @@ function start() {
         fi
         echo "Succesfully retrieved ${CARD_NAME}'s identity'"
     done
+}
 
-    echo "Starting network..."
-    set -x
-    composer network start -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION} \
-    -o endorsementPolicyFile="${DIR}"/endorsement-policy.json \
-    -A admin1 -C "${DIR}"/identities/admin1/admin-pub.pem \
-    -A admin2 -C "${DIR}"/identities/admin2/admin-pub.pem \
-    -A admin3 -C "${DIR}"/identities/admin3/admin-pub.pem
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-        echo "Error in starting network..."
-        exit 1
-    fi
-    echo "Network started"
-
+function importAdminCards() {
     for market in 1 2 3; do
         echo "Creating card for admin${market}"
         set -x
         composer card create -p "${DIR}/connection-market${market}.json" -u admin${market} -n ${NET_NAME} \
-        -c "${DIR}"/identities/admin${market}/admin-pub.pem \
-        -k "${DIR}"/identities/admin${market}/admin-priv.pem \
-        -f "${DIR}"/cards/admin${market}@${NET_NAME}.card
+            -c "${DIR}"/identities/admin${market}/admin-pub.pem \
+            -k "${DIR}"/identities/admin${market}/admin-priv.pem \
+            -f "${DIR}"/cards/admin${market}@${NET_NAME}.card
         res=$?
         set +x
         if [ $res -ne 0 ]; then
@@ -101,6 +80,27 @@ function start() {
             exit 1
         fi
     done
+}
+
+function start() {
+    requestPeerAdminCards
+
+    echo "Starting network..."
+    set -x
+    composer network start -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION} \
+        -o endorsementPolicyFile="${DIR}"/endorsement-policy.json \
+        -A admin1 -C "${DIR}"/identities/admin1/admin-pub.pem \
+        -A admin2 -C "${DIR}"/identities/admin2/admin-pub.pem \
+        -A admin3 -C "${DIR}"/identities/admin3/admin-pub.pem
+    res=$?
+    set +x
+    if [ $res -ne 0 ]; then
+        echo "Error in starting network..."
+        exit 1
+    fi
+    echo "Network started"
+
+    importAdminCards
 }
 
 function checkPrereqs() {
@@ -144,7 +144,10 @@ while getopts "h?" opt; do
 done
 
 
-if [ "$MODE" == "install" ]; then
+if [ "$MODE" == "request" ]; then
+    checkPrereqs
+    requestPeerAdminCard
+elif [ "$MODE" == "install" ]; then
     checkPrereqs
     install
 elif [ "$MODE" == "start" ]; then

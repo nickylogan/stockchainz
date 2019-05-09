@@ -18,6 +18,7 @@ Vagrant.configure("2") do |config|
 
   # Set up the quickstart environment on 16.04 LTS Ubuntu
   config.vm.box = "ubuntu/xenial64"
+  config.disksize.size = '20GB'
 
   # Port forwarding
   config.vm.network "forwarded_port", guest: 3000, host: 3000, auto_correct: true

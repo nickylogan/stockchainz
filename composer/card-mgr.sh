@@ -138,20 +138,19 @@ function bootstrap() {
 }
 
 function clear() {
-    for market in 1 2 3; do
-        CARD_NAME=PeerAdmin@stockchainz-market${market}
-        if composer card list -c ${CARD_NAME} >/dev/null; then
-            composer card delete -c ${CARD_NAME}
-            res=$?
-            if [ $res -ne 0 ]; then
-                echo "Failed to delete card ${CARD_NAME}..."
-                exit 1
-            fi
+    composer card list -q | while read -r card; do
+        composer card delete -c $card
+        res=$?
+        if [ $res -ne 0 ]; then
+            echo "Failed to delete card ${CARD_NAME}..."
+            exit 1
         fi
     done
 
     if [ -d "${DIR}/cards" ]; then
         find "${DIR}"/cards -type f -name 'PeerAdmin*.card' -delete
+        find "${DIR}"/cards -type f -name 'admin*.card' -delete
+        find "${DIR}"/cards -type f -name 'restadmin*.card' -delete
     fi
 
     find ${DIR} -type f -name 'connection-*.json' -delete
