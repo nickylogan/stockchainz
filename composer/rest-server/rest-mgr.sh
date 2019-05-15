@@ -33,6 +33,15 @@ function askProceed() {
 }
 
 function createRestAdmins() {
+    # check if admin cards exist
+    for market in 1 2 3; do
+        ADMIN_CARD=admin${market}@stockchainz
+        if [ -z $(composer card list -q | grep ${ADMIN_CARD}) ]; then
+            echo "ERROR !!! Card ${ADMIN_CARD} not found"
+            exit 1
+        fi
+    done
+    
     for market in 1 2 3; do
         RESTADMIN_ID="restadmin${market}"
         RESTADMIN_CONNECTION_DIR="$HOME/.composer/cards/${RESTADMIN_ID}@stockchainz"
@@ -44,7 +53,7 @@ function createRestAdmins() {
             exit 1
         fi
 
-        composer identity issue -c admin${market}@stockchainz \
+        composer identity issue -c admin${market}@stockchainz -x \
             -f ../cards/${RESTADMIN_ID}.card \
             -u ${RESTADMIN_ID} \
             -a "resource:org.hyperledger.composer.system.NetworkAdmin#${RESTADMIN_ID}"
@@ -88,15 +97,6 @@ function checkPrereqs() {
         echo "ERROR !!! ${ENV_FILE} not found"
         exit 1
     fi
-
-    # check if admin cards exist
-    for market in 1 2 3; do
-        ADMIN_CARD=admin${market}@stockchainz
-        if [ -z $(composer card list -q | grep ${ADMIN_CARD}) ] ; then
-            echo "ERROR !!! Card ${ADMIN_CARD} not found"
-            exit 1
-        fi
-    done
 }
 
 function build() {

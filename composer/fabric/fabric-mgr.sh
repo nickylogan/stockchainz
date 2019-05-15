@@ -60,7 +60,7 @@ function networkUp() {
   fi
 
   IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_CAS -f $COMPOSE_FILE_COUCH up -d 2>&1
-  
+
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Unable to start network"
     exit 1
@@ -80,22 +80,22 @@ function networkDown() {
   if [ -f ${COMPOSE_FILE_CAS} ]; then
     docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_CAS down --volumes
   fi
+}
 
-  # Don't remove the generated artifacts -- note, the ledgers are always removed
-  if [ "$MODE" != "restart" ]; then
-    # Bring down the network, deleting the volumes
-    #Delete any ledger backups
-    docker run -v $PWD:/tmp/first-network --rm hyperledger/fabric-tools:$IMAGETAG rm -Rf /tmp/first-network/ledgers-backup
-    #Cleanup the chaincode containers
-    clearContainers
-    #Cleanup images
-    removeUnwantedImages
-    # remove orderer block and other channel configuration transactions and certs
-    rm -rf channel-artifacts/*.block channel-artifacts/*.tx crypto-config ./org3-artifacts/crypto-config/ channel-artifacts/org3.json
-    # remove the docker-compose yaml file that was customized to the example
-    rm -f docker-compose-e2e.yaml
-    rm -f docker-compose-cas.yaml
-  fi
+function networkDestroy() {
+  networkDown
+  # Bring down the network, deleting the volumes
+  # Delete any ledger backups
+  docker run -v $PWD:/tmp/first-network --rm hyperledger/fabric-tools:$IMAGETAG rm -Rf /tmp/first-network/ledgers-backup
+  # Cleanup the chaincode containers
+  clearContainers
+  # Cleanup images
+  removeUnwantedImages
+  # remove orderer block and other channel configuration transactions and certs
+  rm -rf channel-artifacts/*.block channel-artifacts/*.tx crypto-config ./org3-artifacts/crypto-config/ channel-artifacts/org3.json
+  # remove the docker-compose yaml file that was customized to the example
+  rm -f docker-compose-e2e.yaml
+  rm -f docker-compose-cas.yaml
 }
 
 function replacePrivateKey() {
@@ -157,7 +157,7 @@ function generateChannelArtifacts() {
   echo "##########################################################"
   echo "#########  Generating Orderer Genesis block ##############"
   echo "##########################################################"
-  
+
   set -x
   configtxgen -profile StockchainzOrdererGenesis \
     -outputBlock ./channel-artifacts/genesis.block
@@ -233,8 +233,6 @@ function networkStop() {
 function networkStart() {
   docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CAS start
 }
-
-
 
 # timeout duration - the duration the CLI should wait for a response from
 # another container before giving up

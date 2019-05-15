@@ -9,10 +9,11 @@ VERSION=$( node -p -e "require('../business-network/package.json').version" )
 function printHelp() {
     echo "Usage: "
     echo "  businessnet-mgr.sh <mode>"
-    echo "    <mode> - one of 'request', 'install', 'start'"
+    echo "    <mode> - one of 'request', 'install', 'start', 'import'"
     echo "      - 'request' - requests peer admin cards"
     echo "      - 'install' - installs the business network archive"
     echo "      - 'start' - spins up the business network"
+    echo "      - 'import' - import admin cards"
     echo
     echo "  businessnet-mgr.sh -h (print this message)"
 }
@@ -99,8 +100,6 @@ function start() {
         exit 1
     fi
     echo "Network started"
-
-    importAdminCards
 }
 
 function checkPrereqs() {
@@ -153,6 +152,9 @@ elif [ "$MODE" == "install" ]; then
 elif [ "$MODE" == "start" ]; then
     checkPrereqs
     start
+elif [ "$MODE" == "import" ]; then
+    checkPrereqs
+    importAdminCards
 else
     printHelp
     exit 1

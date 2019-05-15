@@ -21,7 +21,7 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.market1.stockchainz.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/market1.stockchainz.com/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerMarket1
+    container_name: ca.market1.stockchainz.com
     networks:
       - stockchainz
 
@@ -38,7 +38,7 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.market2.stockchainz.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/market2.stockchainz.com/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerMarket2
+    container_name: ca.market2.stockchainz.com
     networks:
       - stockchainz
   
@@ -55,6 +55,6 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.market3.stockchainz.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA3_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/market3.stockchainz.com/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerMarket3
+    container_name: ca.market3.stockchainz.com
     networks:
       - stockchainz
