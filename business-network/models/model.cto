@@ -70,6 +70,7 @@ concept InventoryDelta {
 
 // CreateItem creates an item asset
 transaction CreateItem {
+  o String itemID
   o String name
   o String description optional
 }
@@ -94,8 +95,7 @@ transaction RestockItem {
 // UpdateItem updates an item
 transaction UpdateItem {
   --> Item item
-  o String newName optional
-  o String newDescription optional
+  o String newDescription
 }
 
 // DeleteItem deletes an existing item

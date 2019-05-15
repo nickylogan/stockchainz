@@ -23,27 +23,34 @@ const NS_SALE = 'com.stockchainz.net.Sale';
  * @transaction
  */
 async function onCreateItem(trx) {
-  let name = trx.name;
-  let description = trx.description;
-  let seller = getCurrentParticipant();
+  const itemID = trx.itemID;
+  const name = trx.name;
+  const description = trx.description;
+  const seller = getCurrentParticipant();
 
-  let id = uuidv4();
-  let itemID = `ITEM_${id}`;
-  let invID = `INV_${id}`;
+  if (itemID === '') {
+    throw new Error('Item ID cannot be empty');
+  }
 
-  let item = getFactory().newResource(NS, 'Item', itemID);
+  if (name === '') {
+    throw new Error('Item name cannot be empty');
+  }
+
+  const invID = `INV_${itemID}`;
+
+  const item = getFactory().newResource(NS, 'Item', itemID);
   item.name = name;
   item.description = description;
   item.seller = seller;
 
-  let inventory = getFactory().newResource(NS, 'Inventory', invID);
+  const inventory = getFactory().newResource(NS, 'Inventory', invID);
   inventory.item = item;
   inventory.changes = [];
 
-  let itemRegistry = await getAssetRegistry(NS_ITEM);
+  const itemRegistry = await getAssetRegistry(NS_ITEM);
   await itemRegistry.add(item);
 
-  let invRegistry = await getAssetRegistry(NS_INV);
+  const invRegistry = await getAssetRegistry(NS_INV);
   await invRegistry.add(inventory);
 
   emitEvent(`Successfully added item ${itemID}`);
@@ -55,19 +62,23 @@ async function onCreateItem(trx) {
  * @transaction
  */
 async function onPlaceOrder(trx) {
-  let item = trx.item;
-  let amount = trx.amount;
-  let buyer = getCurrentParticipant();
+  const item = trx.item;
+  const amount = trx.amount;
+  const buyer = getCurrentParticipant();
 
-  let id = uuidv4();
-  let saleID = `SALE_${id}`;
+  if (amount > item.amount) {
+    throw new Error('Not enough items in stock');
+  }
 
-  let sale = getFactory().newResource(NS, 'Sale', saleID);
+  const id = uuidv4();
+  const saleID = `SALE_${id}`;
+
+  const sale = getFactory().newResource(NS, 'Sale', saleID);
   sale.item = item;
   sale.amount = amount;
   sale.buyer = buyer;
 
-  let saleRegistry = await getAssetRegistry(NS_SALE);
+  const saleRegistry = await getAssetRegistry(NS_SALE);
   await saleRegistry.add(sale);
 
   emitEvent(`Successfully placed order ${saleID}`);
@@ -79,8 +90,9 @@ async function onPlaceOrder(trx) {
  * @transaction
  */
 async function onConfirmSale(trx) {
-  let sale = trx.sale;
-  let item = sale.item;
+  const sale = trx.sale;
+  const item = sale.item;
+
   if (sale.amount > item.amount) {
     throw new Error('Not enough items in stock');
   }
@@ -91,27 +103,27 @@ async function onConfirmSale(trx) {
   item.amount -= sale.amount;
 
   const invs = await query('queryInventory', { item: `resource:${item.getFullyQualifiedIdentifier()}` });
-  let inv = invs[0];
+  const inv = invs[0];
 
-  let delta = getFactory().newConcept(NS, 'InventoryDelta');
+  const delta = getFactory().newConcept(NS, 'InventoryDelta');
   delta.amount = -sale.amount;
   delta.type = 'SALE';
   inv.changes.push(delta);
 
   sale.status = 'CONFIRMED';
 
-  let itemRegistry = await getAssetRegistry(NS_ITEM);
+  const itemRegistry = await getAssetRegistry(NS_ITEM);
   await itemRegistry.update(item);
 
-  let invRegistry = await getAssetRegistry(NS_INV);
+  const invRegistry = await getAssetRegistry(NS_INV);
   await invRegistry.update(inv);
 
-  let saleRegistry = await getAssetRegistry(NS_SALE);
+  const saleRegistry = await getAssetRegistry(NS_SALE);
   await saleRegistry.update(sale);
 
   emitEvent(
     `${sale.amount} of item ${item.getIdentifier()} successfully sold to ` +
-      `${sale.buyer.getIdentifier()}. ${item.amount} left in stock.`
+    `${sale.buyer.getIdentifier()}. ${item.amount} left in stock.`
   );
 }
 
@@ -121,28 +133,28 @@ async function onConfirmSale(trx) {
  * @transaction
  */
 async function onRestockItem(trx) {
-  let item = trx.item;
+  const item = trx.item;
 
   item.amount += trx.amount;
 
   const invs = await query('queryInventory', { item: `resource:${item.getFullyQualifiedIdentifier()}` });
-  let inv = invs[0];
+  const inv = invs[0];
 
-  let delta = getFactory().newConcept(NS, 'InventoryDelta');
+  const delta = getFactory().newConcept(NS, 'InventoryDelta');
   delta.amount = trx.amount;
   delta.type = 'RESTOCK';
 
   inv.changes.push(delta);
 
-  let itemRegistry = await getAssetRegistry(NS_ITEM);
+  const itemRegistry = await getAssetRegistry(NS_ITEM);
   await itemRegistry.update(item);
 
-  let invRegistry = await getAssetRegistry(NS_INV);
+  const invRegistry = await getAssetRegistry(NS_INV);
   await invRegistry.update(inv);
 
   emitEvent(
     `Item ${item.getIdentifier()} successfully restocked with amount ${trx.amount}. ` +
-      `Now ${item.amount} in stock.`
+    `Now ${item.amount} in stock.`
   );
 }
 
@@ -152,15 +164,15 @@ async function onRestockItem(trx) {
  * @transaction
  */
 async function onDeleteItem(trx) {
-  let item = trx.item;
+  const item = trx.item;
 
   const invs = await query('queryInventory', { item: `resource:${item.getFullyQualifiedIdentifier()}` });
-  let inv = invs[0];
+  const inv = invs[0];
 
-  let invRegistry = await getAssetRegistry(NS_INV);
+  const invRegistry = await getAssetRegistry(NS_INV);
   await invRegistry.remove(inv);
 
-  let itemRegistry = await getAssetRegistry(NS_ITEM);
+  const itemRegistry = await getAssetRegistry(NS_ITEM);
   await itemRegistry.remove(item);
 
   emitEvent('Item successfully deleted');
@@ -171,12 +183,12 @@ async function onDeleteItem(trx) {
  * @param {com.stockchainz.net.UpdateItem} trx the update item transaction
  * @transaction
  */
-async function onUpdateItemName(trx) {
-  let item = trx.item;
-  item.name = trx.newName;
+async function onUpdateItem(trx) {
+  const item = trx.item;
+  // item.name = trx.newName;
   item.description = trx.newDescription;
 
-  let itemRegistry = await getAssetRegistry(NS_ITEM);
+  const itemRegistry = await getAssetRegistry(NS_ITEM);
 
   await itemRegistry.update(item);
 
@@ -188,7 +200,7 @@ async function onUpdateItemName(trx) {
  * @param {String} msg the message to be broadcasted
  */
 function emitEvent(msg) {
-  var event = getFactory().newEvent(NS, 'TransactionEvent');
+  const event = getFactory().newEvent(NS, 'TransactionEvent');
   event.message = msg;
   emit(event);
 }
@@ -197,7 +209,7 @@ function emitEvent(msg) {
  * Returns a unique ID
  */
 function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
       v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
