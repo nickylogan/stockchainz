@@ -1,0 +1,1 @@
+export const NS = 'com.stockchainz.net';

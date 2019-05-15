@@ -1,0 +1,103 @@
+import React, { Component } from 'react';
+import { Row, Card, Form, InputGroup, Button } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
+import { Role } from '../../../utils/roles';
+import Loader from '../../Loader/Loader';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+
+class Signup extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            processing: false,
+            username: '',
+            role: Role.SELLER,
+        };
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeUsername = this.handleChangeUsername.bind(this);
+        this.handleClickBuyer = this.handleClickBuyer.bind(this);
+        this.handleClickSeller = this.handleClickSeller.bind(this);
+    }
+
+    handleChangeUsername(evt) {
+        this.setState({
+            username: evt.target.value,
+        });
+    }
+
+    handleClickBuyer() {
+        this.setState({
+            role: Role.BUYER,
+        });
+    }
+
+    handleClickSeller() {
+        this.setState({
+            role: Role.SELLER,
+        });
+    }
+
+    handleSubmit() {
+        const { handleSignup } = this.props;
+        const { username, role } = this.state;
+        this.setState({
+            processing: true,
+        });
+
+        const successHandler = () => {
+            this.setState({
+                processing: false,
+            });
+            this.props.history.push('/');
+        };
+
+        const errorHandler = (err) => {
+            toast.error('Unable to register: ' + err);
+            this.setState({
+                processing: false,
+            });
+        }
+
+        handleSignup(username, role, successHandler, errorHandler);
+    }
+
+    render() {
+        const { role } = this.state;
+        const { state } = this.props;
+        if (!state.loggedIn || state.user) {
+            return (<Redirect to="/" />);
+        }
+        return (
+            <Row className="justify-content-center">
+                <Card style={{ width: '18em' }}>
+                    <Card.Body>
+                        <Form>
+                            <Form.Group>
+                                <Form.Label>Username</Form.Label>
+                                <Form.Control placeholder="Enter your username" onChange={this.handleChangeUsername} value={this.state.username}/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Role</Form.Label>
+                                <InputGroup>
+                                    <InputGroup.Prepend>
+                                        <Button size="sm" onClick={this.handleClickSeller} variant={role === Role.SELLER ? 'primary' : 'outline-secondary'}>Seller</Button>
+                                    </InputGroup.Prepend>
+                                    <InputGroup.Append>
+                                        <Button size="sm" onClick={this.handleClickBuyer} variant={role === Role.BUYER ? 'primary' : 'outline-secondary'}>Buyer</Button>
+                                    </InputGroup.Append>
+                                </InputGroup>
+                            </Form.Group>
+                            <Button className="mt-3" disabled={this.state.processing || !this.state.username} onClick={this.handleSubmit}>
+                                {this.state.processing ? <><Loader /> Processing</> : <>Sign up</>}
+                            </Button>
+                        </Form>
+                    </Card.Body>
+                </Card>
+            </Row>
+        )
+    }
+}
+
+export default Signup;
