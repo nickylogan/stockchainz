@@ -1,0 +1,20 @@
+const envPath = __dirname + '/.env';
+require('dotenv').config({ path: envPath });
+
+require('./Setup.test');
+require('./EC1.test');
+require('./EC2.test');
+require('./EC3.test');
+require('./EC4.test');
+require('./EC5.test');
+require('./EC6.test');
+require('./EC7.test');
+require('./EC8.test');
+require('./EC9.test');
+require('./EC10.test');
+require('./EC11.test');
+require('./EC12.test');
+require('./EC13.test');
+require('./EC14.test');
+require('./EC15.test');
+require('./EC16.test');

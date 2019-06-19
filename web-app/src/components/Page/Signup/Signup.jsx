@@ -5,6 +5,7 @@ import { Role } from '../../../utils/roles';
 import Loader from '../../Loader/Loader';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import Config from '../../../utils/config';
 
 class Signup extends Component {
     constructor(props) {
@@ -19,6 +20,39 @@ class Signup extends Component {
         this.handleChangeUsername = this.handleChangeUsername.bind(this);
         this.handleClickBuyer = this.handleClickBuyer.bind(this);
         this.handleClickSeller = this.handleClickSeller.bind(this);
+
+	this.config = new Config();
+    }
+
+    componentWillMount() {
+        const { handleSignin } = this.props;
+        axios
+            .get(`${this.config.restServer.url}/wallet`, { withCredentials: true })
+            .then(async res => {
+                console.log(res);
+                if (res.data.length > 0) {
+                    try {
+                        const { data } = await axios.get(`${this.config.restServer.url}/system/ping`, { withCredentials: true });
+                        const { participant } = data;
+                        let $class, id;
+                        [$class, id] = participant.split('#');
+                        const role = $class.split('.').slice(-1).pop();
+                        handleSignin(id, role);
+                    } catch (err) {
+                        toast.error(err);
+                    }
+                } else {
+                    handleSignin();
+                }
+                
+            })
+            .catch(err => {
+                if (!err.response || !err.response.status === 401) {
+                    toast.error(err);
+                }
+                console.log(err.response);
+            });
+
     }
 
     handleChangeUsername(evt) {

@@ -30,3 +30,6 @@ fabric-samples/
 /composer/*.card
 
 /composer/rest-server/.env
+
+**/.nyc_output
+/composer/rest-server/.env

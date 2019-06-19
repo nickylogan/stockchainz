@@ -35,8 +35,9 @@ services:
       COMPOSER_NAMESPACES: never
       COMPOSER_AUTHENTICATION: 'true'
       COMPOSER_MULTIUSER: 'true'
-      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID1","clientSecret":"$GOOGLE_OAUTH_SECRET1","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"http://$WEBAPP_HOST:4200","failureRedirect":"/"}}'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID1","clientSecret":"$GOOGLE_OAUTH_SECRET1","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL","failureRedirect":"/"}}'
       COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market1.com"}}'
+      GRPC_VERBOSITY: 'DEBUG'
     volumes: 
       - ~/.composer:/home/composer/.composer
     networks: 
@@ -75,8 +76,9 @@ services:
       COMPOSER_NAMESPACES: never
       COMPOSER_AUTHENTICATION: 'true'
       COMPOSER_MULTIUSER: 'true'
-      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID2","clientSecret":"$GOOGLE_OAUTH_SECRET2","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"http://$WEBAPP_HOST:5200","failureRedirect":"/"}}'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID2","clientSecret":"$GOOGLE_OAUTH_SECRET2","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL","failureRedirect":"/"}}'
       COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market2.com"}}'
+      GRPC_VERBOSITY: 'DEBUG'
     volumes: 
       - ~/.composer:/home/composer/.composer
     networks: 
@@ -115,8 +117,9 @@ services:
       COMPOSER_NAMESPACES: never
       COMPOSER_AUTHENTICATION: 'true'
       COMPOSER_MULTIUSER: 'true'
-      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID3","clientSecret":"$GOOGLE_OAUTH_SECRET3","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"http://$WEBAPP_HOST:6200","failureRedirect":"/"}}'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID3","clientSecret":"$GOOGLE_OAUTH_SECRET3","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL","failureRedirect":"/"}}'
       COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market3.com"}}'
+      GRPC_VERBOSITY: 'DEBUG'
     volumes: 
       - ~/.composer:/home/composer/.composer
     networks: 

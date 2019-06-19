@@ -52,7 +52,7 @@ const connectionProfile = {
     'x-type': 'embedded'
 };
 
-describe('PlaceOrder', () => {
+describe('(TC-23 - TC-28): PlaceOrder', () => {
     before(async () => {
         // Generate certificates for use with the embedded connection
         const credentials = CertificateUtil.generate({ commonName: 'admin' });
@@ -147,7 +147,7 @@ describe('PlaceOrder', () => {
         await businessNetworkConnection.connect(sellerCardName);
         // Create transaction
         const createItem = factory.newTransaction(NS, 'CreateItem');
-        createItem.itemID = 'ITEM_1234';
+        createItem.itemID = 'IT_1234';
         createItem.name = 'Test Item';
         createItem.description = 'Test Description';
 
@@ -156,47 +156,47 @@ describe('PlaceOrder', () => {
 
         // Create transaction
         const restockItem = factory.newTransaction(NS, 'RestockItem');
-        restockItem.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        restockItem.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         restockItem.amount = 5;
 
         await businessNetworkConnection.submitTransaction(restockItem);
     });
 
-    it('should allow a buyer to order an item', async () => {
+    it('(TC-23) should allow a buyer to order an item', async () => {
         await businessNetworkConnection.connect(buyerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Create transaction
         const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         placeOrder.amount = 2;
 
         await businessNetworkConnection.submitTransaction(placeOrder);
 
         const query = businessNetworkConnection.buildQuery(`SELECT ${NS_SALE} WHERE (item == _$item)`);
-        const sales = await businessNetworkConnection.query(query, { item: `resource:${NS_ITEM}#ITEM_1234` });
+        const sales = await businessNetworkConnection.query(query, { item: `resource:${NS_ITEM}#IT_1234` });
         sales.should.not.be.empty;
 
         const sale = sales[0];
         sale.should.have.property('amount', 2);
         sale.should.have.property('status', 'UNCONFIRMED');
-        sale.item.getIdentifier().should.equal('ITEM_1234');
+        sale.item.getIdentifier().should.equal('IT_1234');
     });
 
-    it('should not allow a non-buyer to order an item', async () => {
+    it('(TC-24) should not allow a non-buyer to order an item', async () => {
         await businessNetworkConnection.connect(sellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Create transaction
         const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         placeOrder.amount = 2;
 
         return businessNetworkConnection.submitTransaction(placeOrder).should.be.rejected;
     });
 
-    it('should not allow ordering a non-existent item', async () => {
+    it('(TC-25) should not allow ordering a non-existent item', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -207,39 +207,39 @@ describe('PlaceOrder', () => {
 
         return businessNetworkConnection.submitTransaction(placeOrder).should.be.rejected;
     });
-
-    it('should not allow an order if the item in stock isn\'t enough', async () => {
+    
+    it('(TC-26) should not allow an order with negative amount', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Create transaction
         const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
-        placeOrder.amount = 1000;
-
-        return businessNetworkConnection.submitTransaction(placeOrder).should.be.rejected;
-    });
-
-    it('should not allow an order with negative amount', async () => {
-        await businessNetworkConnection.connect(buyerCardName);
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-
-        // Create transaction
-        const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         placeOrder.amount = -1;
 
         return businessNetworkConnection.submitTransaction(placeOrder).should.be.rejected;
     });
+    
+    it('(TC-27) should not allow an order with a zero amount', async () => {
+        await businessNetworkConnection.connect(buyerCardName);
+        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+        
+        // Create transaction
+        const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
+        placeOrder.amount = 0;
+        
+        return businessNetworkConnection.submitTransaction(placeOrder).should.be.rejected;
+    });
 
-    it('should not allow an order with a zero amount', async () => {
+    it('(TC-28) should not allow an order if the item in stock isn\'t enough', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Create transaction
         const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
-        placeOrder.amount = 0;
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
+        placeOrder.amount = 1000;
 
         return businessNetworkConnection.submitTransaction(placeOrder).should.be.rejected;
     });

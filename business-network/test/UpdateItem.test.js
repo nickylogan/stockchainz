@@ -52,7 +52,7 @@ const connectionProfile = {
     'x-type': 'embedded'
 };
 
-describe('UpdateItem', () => {
+describe('(TC-12 - TC-14): UpdateItem', () => {
     before(async () => {
         // Generate certificates for use with the embedded connection
         const credentials = CertificateUtil.generate({ commonName: 'admin' });
@@ -169,7 +169,7 @@ describe('UpdateItem', () => {
         await businessNetworkConnection.submitTransaction(createItem);
     });
 
-    it('should allow a seller to delete an item', async () => {
+    it('(TC-12) should allow a seller to update an item', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
@@ -186,7 +186,7 @@ describe('UpdateItem', () => {
         item.description.should.equal('New description');
     });
 
-    it('should not allow a non-seller to delete an item', async () => {
+    it('(TC-13) should not allow a non-seller to update an item', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -197,7 +197,7 @@ describe('UpdateItem', () => {
         return businessNetworkConnection.submitTransaction(updateItem).should.be.rejected;
     });
 
-    it('should not allow a seller to delete another seller\'s item', async () => {
+    it('(TC-14) should not allow a seller to update another seller\'s item', async () => {
         await businessNetworkConnection.connect(otherSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 

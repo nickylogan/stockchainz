@@ -53,7 +53,9 @@ async function onCreateItem(trx) {
   const invRegistry = await getAssetRegistry(NS_INV);
   await invRegistry.add(inventory);
 
-  emitEvent(`Successfully added item ${itemID}`);
+  const event = getFactory().newEvent(NS, 'ItemCreated');
+  event.itemID = itemID;
+  emit(event);
 }
 
 /**
@@ -70,8 +72,8 @@ async function onPlaceOrder(trx) {
     throw new Error('Not enough items in stock');
   }
 
-  const id = uuidv4();
-  const saleID = `SALE_${id}`;
+  const id = trx.transactionId;
+  const saleID = `S_${id}`;
 
   const sale = getFactory().newResource(NS, 'Sale', saleID);
   sale.item = item;
@@ -81,7 +83,9 @@ async function onPlaceOrder(trx) {
   const saleRegistry = await getAssetRegistry(NS_SALE);
   await saleRegistry.add(sale);
 
-  emitEvent(`Successfully placed order ${saleID}`);
+  const event = getFactory().newEvent(NS, 'OrderPlaced');
+  event.saleID = saleID;
+  emit(event);
 }
 
 /**
@@ -121,10 +125,15 @@ async function onConfirmSale(trx) {
   const saleRegistry = await getAssetRegistry(NS_SALE);
   await saleRegistry.update(sale);
 
-  emitEvent(
-    `${sale.amount} of item ${item.getIdentifier()} successfully sold to ` +
-    `${sale.buyer.getIdentifier()}. ${item.amount} left in stock.`
-  );
+  const event1 = getFactory().newEvent(NS, 'SaleConfirmed');
+  event1.saleID = sale.saleID;
+  emit(event1);
+
+  const event2 = getFactory().newEvent(NS, 'StockChanged');
+  event2.itemID = item.itemID;
+  event2.oldAmount = item.amount + sale.amount;
+  event2.newAmount = item.amount;
+  emit(event2);
 }
 
 /**
@@ -152,10 +161,11 @@ async function onRestockItem(trx) {
   const invRegistry = await getAssetRegistry(NS_INV);
   await invRegistry.update(inv);
 
-  emitEvent(
-    `Item ${item.getIdentifier()} successfully restocked with amount ${trx.amount}. ` +
-    `Now ${item.amount} in stock.`
-  );
+  const event = getFactory().newEvent(NS, 'StockChanged');
+  event.itemID = item.itemID;
+  event.oldAmount = item.amount - trx.amount;
+  event.newAmount = item.amount;
+  emit(event);
 }
 
 /**
@@ -166,16 +176,12 @@ async function onRestockItem(trx) {
 async function onDeleteItem(trx) {
   const item = trx.item;
 
-  const invs = await query('queryInventory', { item: `resource:${item.getFullyQualifiedIdentifier()}` });
-  const inv = invs[0];
-
-  const invRegistry = await getAssetRegistry(NS_INV);
-  await invRegistry.remove(inv);
-
   const itemRegistry = await getAssetRegistry(NS_ITEM);
   await itemRegistry.remove(item);
 
-  emitEvent('Item successfully deleted');
+  const event = getFactory().newEvent(NS, 'ItemDeleted');
+  event.itemID = item.itemID;
+  emit(event);
 }
 
 /**
@@ -185,6 +191,7 @@ async function onDeleteItem(trx) {
  */
 async function onUpdateItem(trx) {
   const item = trx.item;
+  const oldDesc = item.description;
   // item.name = trx.newName;
   item.description = trx.newDescription;
 
@@ -192,26 +199,10 @@ async function onUpdateItem(trx) {
 
   await itemRegistry.update(item);
 
-  emitEvent('Update success');
-}
-
-/**
- * Emits an event containing the specified message
- * @param {String} msg the message to be broadcasted
- */
-function emitEvent(msg) {
-  const event = getFactory().newEvent(NS, 'TransactionEvent');
-  event.message = msg;
+  const event = getFactory().newEvent(NS, 'ItemModified');
+  event.itemID = item.itemID;
+  event.oldDescription = oldDesc;
+  event.newDescription = item.description;
   emit(event);
 }
 
-/**
- * Returns a unique ID
- */
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}

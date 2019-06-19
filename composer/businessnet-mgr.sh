@@ -87,16 +87,27 @@ function start() {
     requestPeerAdminCards
 
     echo "Starting network..."
-    set -x
-    composer network start -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION} \
-        -o endorsementPolicyFile="${DIR}"/endorsement-policy.json \
-        -A admin1 -C "${DIR}"/identities/admin1/admin-pub.pem \
-        -A admin2 -C "${DIR}"/identities/admin2/admin-pub.pem \
-        -A admin3 -C "${DIR}"/identities/admin3/admin-pub.pem
-    res=$?
-    set +x
+    COUNTER=0
+    MAX_RETRY=3
+    while [ $COUNTER -lt $MAX_RETRY ]; do
+        set -x
+        composer network start -c PeerAdmin@stockchainz-market1 -n ${NET_NAME} -V ${VERSION} \
+            -o endorsementPolicyFile="${DIR}"/endorsement-policy.json \
+            -A admin1 -C "${DIR}"/identities/admin1/admin-pub.pem \
+            -A admin2 -C "${DIR}"/identities/admin2/admin-pub.pem \
+            -A admin3 -C "${DIR}"/identities/admin3/admin-pub.pem
+        res=$?
+        set +x
+        if [ $res -ne 0 ]; then
+            echo "Error in starting network... Retrying after 5 seconds"
+            COUNTER=$(expr $COUNTER + 1)
+            sleep 5s
+        else
+            break
+        fi
+    done
     if [ $res -ne 0 ]; then
-        echo "Error in starting network..."
+        echo "Unable to start network. Exiting..."
         exit 1
     fi
     echo "Network started"

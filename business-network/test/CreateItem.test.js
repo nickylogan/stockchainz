@@ -52,7 +52,7 @@ const connectionProfile = {
     'x-type': 'embedded'
 };
 
-describe('CreateItem', () => {
+describe('(TC-7 - TC-11): CreateItem', () => {
     before(async () => {
         // Generate certificates for use with the embedded connection
         const credentials = CertificateUtil.generate({ commonName: 'admin' });
@@ -103,7 +103,7 @@ describe('CreateItem', () => {
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Create new seller participant
-        const sellerUserName = 'test-seller';
+        const sellerUserName = 'test-seller1';
         const seller = factory.newResource(NS, 'Seller', sellerUserName);
         seller.name = 'Test Seller';
 
@@ -141,14 +141,14 @@ describe('CreateItem', () => {
         await adminConnection.importCard(buyerCardName, buyerCard);
     });
 
-    it('should allow a seller to create an item', async () => {
+    it('(TC-7) should allow a seller to create an item', async () => {
         await businessNetworkConnection.connect(sellerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Create transaction
         const createItem = factory.newTransaction(NS, 'CreateItem');
-        createItem.itemID = 'ITEM_1234';
+        createItem.itemID = 'IT_1234';
         createItem.name = 'Test Item';
         createItem.description = 'Test Description';
 
@@ -159,60 +159,77 @@ describe('CreateItem', () => {
         const itemRegistry = await businessNetworkConnection.getAssetRegistry(NS_ITEM);
         const invRegistry = await businessNetworkConnection.getAssetRegistry(NS_INV);
         
-        /** @type {Item} */
-        const item = await itemRegistry.get('ITEM_1234');
+        const item = await itemRegistry.get('IT_1234');
+        should.exist(item);
         item.should.have.property('name', 'Test Item');
         item.should.have.property('description', 'Test Description');
         item.should.have.property('amount', 0);
         item.should.have.property('seller');
-        item.seller.getIdentifier().should.equal('test-seller');
+        item.seller.getIdentifier().should.equal('test-seller1');
 
-        /** @type {Inventory} */
-        const inv = await invRegistry.get('INV_ITEM_1234');
+        const inv = await invRegistry.get('INV_IT_1234');
         should.exist(inv);
-        inv.should.have.property('changes');
         inv.should.have.property('item');
-        inv.item.getIdentifier().should.equal('ITEM_1234');
+        inv.item.getIdentifier().should.equal('IT_1234');
+        inv.should.have.property('changes');
         inv.changes.should.have.length(0);
     });
 
-    it('should not allow a non-seller to create an item', async () => {
-        await businessNetworkConnection.connect(buyerCardName);
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-
-        const createItem = factory.newTransaction(NS, 'CreateItem');
-        createItem.itemID = 'ITEM_1234';
-        createItem.name = 'Test item';
-        createItem.description = 'Test Description';
-
-        return businessNetworkConnection.submitTransaction(createItem).should.be.rejected;
-    });
-
-    it('should not allow creating a no-id item', async () => {
+    it('(TC-8) should not allow creating a duplicate item', async () => {
         await businessNetworkConnection.connect(sellerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
+        // Create transaction
+        const createItem = factory.newTransaction(NS, 'CreateItem');
+        createItem.itemID = 'IT_1234';
+        createItem.name = 'Test Item';
+        createItem.description = 'Test Description';
+
+        // Submit transaction
+        await businessNetworkConnection.submitTransaction(createItem);
+
+        return businessNetworkConnection.submitTransaction(createItem).should.be.rejected;
+    });
+
+    
+    it('(TC-9) should not allow creating a no-id item', async () => {
+        await businessNetworkConnection.connect(sellerCardName);
+
+        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+        
         // Create transaction
         const createItem = factory.newTransaction(NS, 'CreateItem');
         createItem.itemID = '';
         createItem.name = 'Test item';
-
+        
         // Submit transaction
         return businessNetworkConnection.submitTransaction(createItem).should.be.rejected;
     });
 
-    it('should not allow creating a no-name item', async () => {
+    it('(TC-10) should not allow creating a no-name item', async () => {
         await businessNetworkConnection.connect(sellerCardName);
-
+        
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-
+        
         // Create transaction
         const createItem = factory.newTransaction(NS, 'CreateItem');
-        createItem.itemID = 'ITEM_1234';
+        createItem.itemID = 'IT_1234';
         createItem.name = '';
-
+        
         // Submit transaction
+        return businessNetworkConnection.submitTransaction(createItem).should.be.rejected;
+    });
+
+    it('(TC-11) should not allow a non-seller to create an item', async () => {
+        await businessNetworkConnection.connect(buyerCardName);
+        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+
+        const createItem = factory.newTransaction(NS, 'CreateItem');
+        createItem.itemID = 'IT_1234';
+        createItem.name = 'Test item';
+        createItem.description = 'Test Description';
+
         return businessNetworkConnection.submitTransaction(createItem).should.be.rejected;
     });
 });

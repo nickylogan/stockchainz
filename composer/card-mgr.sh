@@ -156,7 +156,7 @@ function clear() {
     find ${DIR} -type f -name 'connection-*.json' -delete
 
     echo
-    echo "============ PeerAdmin cards successfully cleared ============="
+    echo "============ Network cards successfully cleared ============="
 }
 
 MODE=$1

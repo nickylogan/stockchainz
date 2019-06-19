@@ -103,7 +103,36 @@ transaction DeleteItem {
   --> Item item
 }
 
-// TransactionEvent represents events resulting from any item transaction
-event TransactionEvent {
-  o String message
+// ItemCreated is emitted whenever an item is newly created
+event ItemCreated {
+  o String itemID
+}
+
+// StockChanged is emitted whenever an item's stock changed
+event StockChanged {
+  o String itemID
+  o Integer oldAmount
+  o Integer newAmount
+}
+
+// ItemModified is emitted whenever an item is modified
+event ItemModified {
+  o String itemID
+  o String oldDescription
+  o String newDescription
+}
+
+// ItemDeleted is emitted whenever an item is deleted
+event ItemDeleted {
+  o String itemID
+}
+
+// OrderPlaced is emitted whenever an order is placed
+event OrderPlaced {
+  o String saleID
+}
+
+// SaleConfirmed is emitted
+event SaleConfirmed {
+  o String saleID
 }

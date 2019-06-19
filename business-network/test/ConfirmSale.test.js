@@ -56,7 +56,7 @@ const connectionProfile = {
     'x-type': 'embedded'
 };
 
-describe('ConfirmSale', () => {
+describe('(TC-29 - TC-34) ConfirmSale', () => {
     before(async () => {
         // Generate certificates for use with the embedded connection
         const credentials = CertificateUtil.generate({ commonName: 'admin' });
@@ -165,30 +165,30 @@ describe('ConfirmSale', () => {
 
         // 1. Create an item first
         const createItem = factory.newTransaction(NS, 'CreateItem');
-        createItem.itemID = 'ITEM_1234';
+        createItem.itemID = 'IT_1234';
         createItem.name = 'Test Item';
         createItem.description = 'Test Description';
         await businessNetworkConnection.submitTransaction(createItem);
 
         // 2. Restock the item
         const restockItem = factory.newTransaction(NS, 'RestockItem');
-        restockItem.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        restockItem.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         restockItem.amount = 5;
         await businessNetworkConnection.submitTransaction(restockItem);
 
         // 3. Have a buyer order the item
         await businessNetworkConnection.connect(buyerCardName);
         const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         placeOrder.amount = 2;
         await businessNetworkConnection.submitTransaction(placeOrder);
 
         const query = businessNetworkConnection.buildQuery(`SELECT ${NS_SALE} WHERE (item == _$item)`);
-        const sales = await businessNetworkConnection.query(query, { item: `resource:${NS_ITEM}#ITEM_1234` });
+        const sales = await businessNetworkConnection.query(query, { item: `resource:${NS_ITEM}#IT_1234` });
         saleID = sales[0].getIdentifier();
     });
 
-    it('should allow a seller to confirm a sale', async () => {
+    it('(TC-29) should allow a seller to confirm a sale', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
@@ -199,12 +199,16 @@ describe('ConfirmSale', () => {
         await businessNetworkConnection.submitTransaction(saleConfirmation);
 
         const saleRegistry = await businessNetworkConnection.getAssetRegistry(NS_SALE);
+        const itemRegistry = await businessNetworkConnection.getAssetRegistry(NS_ITEM);
+
+        /** @type {Item} */
+        const item = await itemRegistry.get('IT_1234');
+
+        /** @type {Inventory[]} */
+        const invs = await businessNetworkConnection.query('queryInventory', { item: `resource:${item.getFullyQualifiedIdentifier()}` });
+        const inv = invs[0];
 
         const sale = await saleRegistry.get(saleID);
-        const items = await businessNetworkConnection.query('queryItem', { id: sale.item.getIdentifier() });
-        const invs = await businessNetworkConnection.query('queryInventory', { item: `resource:${sale.item.getFullyQualifiedIdentifier()}` });
-        const item = items[0];
-        const inv = invs[0];
 
         sale.status.should.equal("CONFIRMED");
         item.amount.should.equal(3);
@@ -213,7 +217,7 @@ describe('ConfirmSale', () => {
         inv.changes[1].amount.should.equal(-2);
     });
 
-    it('should not allow a non-seller to confirm a sale', async () => {
+    it('(TC-30) should not allow a non-seller to confirm a sale', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -223,7 +227,7 @@ describe('ConfirmSale', () => {
         return businessNetworkConnection.submitTransaction(saleConfirmation).should.be.rejected;
     });
 
-    it('should not allow a seller to confirm another seller\'s sale', async () => {
+    it('(TC-31) should not allow a seller to confirm another seller\'s sale', async () => {
         await businessNetworkConnection.connect(otherSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -233,7 +237,7 @@ describe('ConfirmSale', () => {
         return businessNetworkConnection.submitTransaction(saleConfirmation).should.be.rejected;
     });
 
-    it('should not allow confirming a non-existent sale', async () => {
+    it('(TC-32) should not allow confirming a non-existent sale', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -243,13 +247,25 @@ describe('ConfirmSale', () => {
         return businessNetworkConnection.submitTransaction(saleConfirmation).should.be.rejected;
     });
 
-    it('should not allow confirming a sale if the item in stock is not enough', async () => {
+    it('(TC-33) should not allow confirming an already confirmed sale', async () => {
+        await businessNetworkConnection.connect(ownerSellerCardName);
+
+        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
+
+        const saleConfirmation = factory.newTransaction(NS, 'ConfirmSale');
+        saleConfirmation.sale = factory.newRelationship(NS, 'Sale', saleID);
+
+        await businessNetworkConnection.submitTransaction(saleConfirmation);
+        return businessNetworkConnection.submitTransaction(saleConfirmation).should.be.rejected;
+    });
+
+    it('(TC-34) should not allow confirming a sale if the item in stock is not enough', async () => {
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
         // Have a buyer order the item (sale not confirmed yet)
         await businessNetworkConnection.connect(buyerCardName);
         const placeOrder = factory.newTransaction(NS, 'PlaceOrder');
-        placeOrder.item = factory.newRelationship(NS, 'Item', 'ITEM_1234');
+        placeOrder.item = factory.newRelationship(NS, 'Item', 'IT_1234');
         placeOrder.amount = 5;
         await businessNetworkConnection.submitTransaction(placeOrder);
 
@@ -261,7 +277,7 @@ describe('ConfirmSale', () => {
 
         // Get unconfirmed sale
         const query = businessNetworkConnection.buildQuery(`SELECT ${NS_SALE} WHERE (item == _$item AND status == 'UNCONFIRMED')`);
-        const sales = await businessNetworkConnection.query(query, { item: `resource:${NS_ITEM}#ITEM_1234` });
+        const sales = await businessNetworkConnection.query(query, { item: `resource:${NS_ITEM}#IT_1234` });
         const otherSaleID = sales[0].getIdentifier();
 
         const otherSaleConfirmation = factory.newTransaction(NS, 'ConfirmSale');

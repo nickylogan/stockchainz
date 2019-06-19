@@ -59,12 +59,22 @@ class App extends Component {
       options: {},
     };
     try {
-      await axios.post(participantURL, {
-        '$class': $class,
-        [role.toLowerCase() + 'ID']: userID,
-        'name': username,
-      });
+      let accountExists = true;
+      axios
+        .get(`${participantURL}/${userID}`)
+        .catch(err => {
+	  if(err.response && err.response.status == 404)
+	    accountExists = false;
+	});
 
+      if (!accountExists) {
+        await axios.post(participantURL, {
+          '$class': $class,
+          [role.toLowerCase() + 'ID']: userID,
+          'name': username,
+        });
+      }
+     
       const resp = await axios.post(`${this.config.accountServer.url}/system/identities/issue`,
         identity, { responseType: 'blob' });
       const cardData = resp.data;
@@ -108,7 +118,7 @@ class App extends Component {
               <Index {...props} handleSignin={this.handleSignin} state={this.state} />
             } />
             <Route key="1" path="/signup" exact={true} render={(props) =>
-              <Signup {...props} state={this.state} handleSignup={this.handleSignup} />
+              <Signup {...props} handleSignin={this.handleSignin} state={this.state} handleSignup={this.handleSignup} />
             } />
           </Switch>
         </Container>

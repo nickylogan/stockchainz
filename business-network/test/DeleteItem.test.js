@@ -52,7 +52,7 @@ const connectionProfile = {
     'x-type': 'embedded'
 };
 
-describe('DeleteItem', () => {
+describe('(TC-15 - TC-17): DeleteItem', () => {
     before(async () => {
         // Generate certificates for use with the embedded connection
         const credentials = CertificateUtil.generate({ commonName: 'admin' });
@@ -169,7 +169,7 @@ describe('DeleteItem', () => {
         await businessNetworkConnection.submitTransaction(createItem);
     });
 
-    it('should allow a seller to delete an item', async () => {
+    it('(TC-15) should allow a seller to delete an item', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
@@ -179,11 +179,11 @@ describe('DeleteItem', () => {
 
         await businessNetworkConnection.submitTransaction(deleteItem);
 
-        const items = businessNetworkConnection.query('queryItem', { id: 'ITEM_1234' });
-        items.should.be.empty;
+        const itemRegistry = await businessNetworkConnection.getAssetRegistry(NS_ITEM);        
+        return itemRegistry.get('IT_1234').should.be.rejected;
     });
 
-    it('should not allow a non-seller to delete an item', async () => {
+    it('(TC-16) should not allow a non-seller to delete an item', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -193,7 +193,7 @@ describe('DeleteItem', () => {
         return businessNetworkConnection.submitTransaction(deleteItem).should.be.rejected;
     });
 
-    it('should not allow a seller to delete another seller\'s item', async () => {
+    it('(TC-17) should not allow a seller to delete another seller\'s item', async () => {
         await businessNetworkConnection.connect(otherSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 

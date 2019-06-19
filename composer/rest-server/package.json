@@ -1,0 +1,27 @@
+{
+  "name": "rest-server",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "nyc mocha -t 0 -s 5000 -b test/index.test.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/register": "^7.4.4",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chai-http": "^4.3.0",
+    "dotenv": "^8.0.0",
+    "file-api": "^0.10.4",
+    "form-data": "^2.3.3",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1",
+    "supertest": "^4.0.2",
+    "uuidv4": "^4.0.0"
+  }
+}

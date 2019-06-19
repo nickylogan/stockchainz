@@ -12,12 +12,6 @@
  * limitations under the License.
  */
 
-query queryItem {
-  description: "Queries an item's information based on its item ID"
-  statement: 
-    SELECT com.stockchainz.net.Item WHERE (itemID == _$id)
-}
-
 query queryInventory {
   description: "Queries an item's inventory history based on its item ID"
   statement:

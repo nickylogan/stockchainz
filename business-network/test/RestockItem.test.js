@@ -54,7 +54,7 @@ const connectionProfile = {
     'x-type': 'embedded'
 };
 
-describe('RestockItem', () => {
+describe('(TC-18 - TC-22): RestockItem', () => {
     before(async () => {
         // Generate certificates for use with the embedded connection
         const credentials = CertificateUtil.generate({ commonName: 'admin' });
@@ -171,7 +171,7 @@ describe('RestockItem', () => {
         await businessNetworkConnection.submitTransaction(createItem);
     });
 
-    it('should allow a seller to restock an item', async () => {
+    it('(TC-18) should allow a seller to restock an item', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
 
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
@@ -201,7 +201,7 @@ describe('RestockItem', () => {
         }
     });
 
-    it('should not allow a non-seller to restock an item', async () => {
+    it('(TC-19) should not allow a non-seller to restock an item', async () => {
         await businessNetworkConnection.connect(buyerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -212,7 +212,7 @@ describe('RestockItem', () => {
         return businessNetworkConnection.submitTransaction(restockItem).should.be.rejected;
     });
 
-    it('should not allow a seller to restock another seller\'s item', async () => {
+    it('(TC-20) should not allow a seller to restock another seller\'s item', async () => {
         await businessNetworkConnection.connect(otherSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -223,18 +223,7 @@ describe('RestockItem', () => {
         return businessNetworkConnection.submitTransaction(restockItem).should.be.rejected;
     });
 
-    it('should not allow restocking a non-existent item', async () => {
-        await businessNetworkConnection.connect(ownerSellerCardName);
-        const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
-
-        const restockItem = factory.newTransaction(NS, 'RestockItem');
-        restockItem.item = factory.newRelationship(NS, 'Item', 'ITEM_9999');
-        restockItem.amount = 5;
-
-        return businessNetworkConnection.submitTransaction(restockItem).should.be.rejected;
-    });
-
-    it('should not allow negative restock', async () => {
+    it('(TC-21) should not allow negative restock', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
@@ -245,7 +234,7 @@ describe('RestockItem', () => {
         return businessNetworkConnection.submitTransaction(restockItem).should.be.rejected;
     });
 
-    it('should not allow zero restock', async () => {
+    it('(TC-22) should not allow zero restock', async () => {
         await businessNetworkConnection.connect(ownerSellerCardName);
         const factory = businessNetworkConnection.getBusinessNetwork().getFactory();
 
