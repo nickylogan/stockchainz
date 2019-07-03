@@ -3,6 +3,7 @@ import { Sale, RequestError } from 'utils/types';
 import toaster from 'toasted-notes';
 
 import { default as SaleListView } from './SaleList-view';
+import Config from 'utils/config';
 
 interface Props {
   role: string;
@@ -12,6 +13,9 @@ interface State {
   sales: Array<Sale>;
   loaded: boolean;
 }
+
+const config = new Config();
+const wss = new WebSocket(config.restServer.wsURL);
 
 export default class SaleList extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -26,6 +30,15 @@ export default class SaleList extends React.Component<Props, State> {
 
   componentWillMount() {
     this.requestSales();
+    wss.onmessage = evt => {
+      const { $class } = JSON.parse(evt.data);
+      switch($class) {
+        case "com.stockchainz.net.OrderPlaced":
+        case "com.stockchainz.net.SaleConfirmed":
+        case "com.stockchainz.net.ItemDeleted":
+          this.requestSales();
+      }
+    };
   }
 
   requestSales() {
@@ -38,7 +51,7 @@ export default class SaleList extends React.Component<Props, State> {
       .catch(err => {
         toaster.notify('❌ Cannot load sales: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
       })
       .finally(() => {
@@ -49,6 +62,13 @@ export default class SaleList extends React.Component<Props, State> {
   render() {
     const { role } = this.props;
     const { sales, loaded } = this.state;
-    return <SaleListView role={role} sales={sales} loaded={loaded}/>;
+    return (
+      <SaleListView
+        role={role}
+        sales={sales}
+        loaded={loaded}
+        refresh={this.requestSales.bind(this)}
+      />
+    );
   }
 }

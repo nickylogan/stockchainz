@@ -3,6 +3,7 @@ import { Item, RequestError, Participant } from 'utils/types';
 import toaster from 'toasted-notes';
 
 import { default as ItemListView } from './ItemList-view';
+import Config from 'utils/config';
 
 interface State {
   items: Array<Item>;
@@ -12,6 +13,9 @@ interface State {
 interface Props {
   user: Participant;
 }
+
+const config = new Config();
+const wss = new WebSocket(config.restServer.wsURL);
 
 export default class ItemList extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -26,6 +30,16 @@ export default class ItemList extends React.Component<Props, State> {
 
   componentWillMount() {
     this.requestItems();
+    wss.onmessage = evt => {
+      const { $class } = JSON.parse(evt.data);
+      switch($class) {
+        case "com.stockchainz.net.StockChanged":
+        case "com.stockchainz.net.ItemModified":
+        case "com.stockchainz.net.ItemCreated":
+        case "com.stockchainz.net.ItemDeleted":
+          this.requestItems();
+      }
+    };
   }
 
   requestItems() {
@@ -38,7 +52,7 @@ export default class ItemList extends React.Component<Props, State> {
       .catch(err => {
         toaster.notify('❌ Cannot load items: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
       })
       .finally(() => {

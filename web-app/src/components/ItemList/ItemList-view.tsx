@@ -9,6 +9,7 @@ import DeleteModal from 'components/DeleteModal';
 import RestockModal from 'components/RestockModal';
 import ItemCard from './ItemCard';
 import { Item, Seller, Buyer, Participant } from 'utils/types';
+import InventoryModal from 'components/InventoryModal';
 
 // const testItems = [
 //     {
@@ -44,10 +45,12 @@ interface State {
   editModalOpen: boolean;
   deleteModalOpen: boolean;
   restockModalOpen: boolean;
+  inventoryModalOpen: boolean;
   itemForOrder: Item;
   itemForEdit: Item;
   itemForDelete: Item;
   itemForRestock: Item;
+  itemForInventory: Item;
 }
 
 export default class Items extends React.Component<Props, State> {
@@ -60,10 +63,12 @@ export default class Items extends React.Component<Props, State> {
       editModalOpen: false,
       deleteModalOpen: false,
       restockModalOpen: false,
+      inventoryModalOpen: false,
       itemForOrder: new Item('', '', ''),
       itemForEdit: new Item('', '', ''),
       itemForDelete: new Item('', '', ''),
-      itemForRestock: new Item('', '', '')
+      itemForRestock: new Item('', '', ''),
+      itemForInventory: new Item('', '', '')
     };
 
     this.openAddModal = this.openAddModal.bind(this);
@@ -71,6 +76,7 @@ export default class Items extends React.Component<Props, State> {
     this.openEditModal = this.openEditModal.bind(this);
     this.openDeleteModal = this.openDeleteModal.bind(this);
     this.openRestockModal = this.openRestockModal.bind(this);
+    this.openInventoryModal = this.openInventoryModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
   }
 
@@ -108,13 +114,21 @@ export default class Items extends React.Component<Props, State> {
     });
   }
 
+  openInventoryModal(item: Item) {
+    this.setState({
+      inventoryModalOpen: true,
+      itemForInventory: item
+    });
+  }
+
   closeModal() {
     this.setState({
       addModalOpen: false,
       orderModalOpen: false,
       editModalOpen: false,
       deleteModalOpen: false,
-      restockModalOpen: false
+      restockModalOpen: false,
+      inventoryModalOpen: false
     });
   }
 
@@ -146,6 +160,7 @@ export default class Items extends React.Component<Props, State> {
                   editItem={this.openEditModal}
                   deleteItem={this.openDeleteModal}
                   restockItem={this.openRestockModal}
+                  checkInventory={this.openInventoryModal}
                 />
               ))
             )}
@@ -175,6 +190,11 @@ export default class Items extends React.Component<Props, State> {
               shown={this.state.deleteModalOpen}
               item={this.state.itemForDelete}
               handleSuccess={refresh}
+            />
+            <InventoryModal
+              onHide={this.closeModal}
+              shown={this.state.inventoryModalOpen}
+              item={this.state.itemForInventory}
             />
           </>
         )}

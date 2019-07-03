@@ -283,15 +283,6 @@ export class Item extends Model {
     );
   }
 
-  static requestInventory(item: Item) {
-    return Axios.get(config.restServer.url + '/queries/queryInventory', {
-      params: {
-        item: item.getResourceLocator()
-      },
-      withCredentials: true
-    });
-  }
-
   static mapToItem(item: {
     seller: string;
     itemID: string;
@@ -355,6 +346,49 @@ export class Item extends Model {
   }
 }
 
+export enum DeltaType {
+  RESTOCK = 'RESTOCK',
+  SALE = 'SALE'
+}
+
+export interface InventoryDelta extends Model {
+  amount: number;
+  type: DeltaType;
+}
+
+export class Inventory extends Model {
+  static TYPE = 'Inventory';
+  itemID: string;
+  changes: InventoryDelta[];
+
+  constructor(id: string, itemID: string, changes: Array<InventoryDelta>) {
+    super(Inventory.TYPE, id);
+    this.itemID = itemID;
+    this.changes = changes;
+  }
+
+  static requestOfItem(item: Item): Promise<Inventory> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await Axios.get(config.restServer.url + '/queries/queryInventory', {
+          params: {
+            item: item.getResourceLocator()
+          },
+          withCredentials: true
+        });
+        const invData = response.data[0];
+        const changes: Array<InventoryDelta> = invData.changes.map(
+          (delta: { amount: number; type: string }) => ({ amount: delta.amount, type: delta.type })
+        );
+        const [, itemID] = Model.split(invData.item);
+        resolve(new Inventory(invData.invID, itemID, changes));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+}
+
 export class Sale extends Model {
   static TYPE = 'Sale';
 
@@ -410,9 +444,19 @@ export class Sale extends Model {
       try {
         const [, itemID] = Model.split(sale.item);
         const [, buyerID] = Model.split(sale.buyer);
-        const item = await Item.requestData(itemID);
         const buyer = new Buyer(buyerID, '');
-        resolve(new Sale(sale.saleID, item, sale.amount, buyer, sale.status === 'CONFIRMED'));
+        try {
+          const item = await Item.requestData(itemID);
+          resolve(new Sale(sale.saleID, item, sale.amount, buyer, sale.status === 'CONFIRMED'));
+        } catch (err) {
+          if (err.response.status === 404) {
+            console.log(err.response);
+            const item = new Item('', '', '');
+            resolve(new Sale(sale.saleID, item, sale.amount, buyer, sale.status === 'CONFIRMED'));
+          } else {
+            throw err;
+          }
+        }
       } catch (err) {
         reject(err);
       }
@@ -436,8 +480,8 @@ export class Sale extends Model {
             }) => await this.mapToSale(sale)
           )
         );
-        
-        resolve(sales);
+
+        resolve(sales.filter(sale => sale.item.id !== ''));
       } catch (err) {
         reject(err);
       }
@@ -450,9 +494,9 @@ export class RequestError {
     if (err.response) {
       let message: string = err.response.data.error.message;
       if (message.indexOf('AccessException') !== -1) {
-        return "Unallowed access";
+        return 'Unallowed access';
       }
-      message = message.split('\n')[1];
+      message = message.split('\n')[1] || message;
       message = message.slice(message.lastIndexOf('Error'));
       message = message.slice(message.lastIndexOf(':'));
       message = _.trim(message);

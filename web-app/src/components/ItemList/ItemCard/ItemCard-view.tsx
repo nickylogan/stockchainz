@@ -5,6 +5,7 @@ import { Seller, Buyer, Item, Participant } from 'utils/types';
 interface Props {
   item: Item;
   user: Participant;
+  checkInventory: (item: Item) => void;
   editItem: (item: Item) => void;
   orderItem: (item: Item) => void;
   restockItem: (item: Item) => void;
@@ -14,11 +15,23 @@ interface Props {
 export default class ItemCard extends React.Component<Props> {
   render() {
     const { item, user } = this.props;
-    const { orderItem, editItem, deleteItem, restockItem } = this.props;
+    const { orderItem, editItem, deleteItem, restockItem, checkInventory } = this.props;
     return (
       <Card>
         <Card.Body>
-          <Card.Title>{item.name}</Card.Title>
+          <Card.Title>
+            {item.name}
+            {item.seller && user.type === Seller.TYPE && user.id === item.seller.id && (
+              <Button
+                variant="link"
+                className="ml-1 text-secondary"
+                onClick={() => checkInventory(item)}
+                size="sm"
+              >
+                <small>Details</small>
+              </Button>
+            )}
+          </Card.Title>
           <Card.Text>
             {item.description}
             <br />

@@ -4,7 +4,7 @@ export default class Config {
     color: string;
     name: string;
   };
-  restServer: { url: string; authURL: string };
+  restServer: { url: string; wsURL: string, authURL: string };
   accountServer: { url: string };
 
   constructor() {
@@ -15,6 +15,7 @@ export default class Config {
     };
     this.restServer = {
       url: 'http://api-market1-stockchainz.serveo.net/api',
+      wsURL: 'ws://api-market1-stockchainz.serveo.net',
       authURL: 'http://api-market1-stockchainz.serveo.net/auth'
     };
 

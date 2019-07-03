@@ -53,7 +53,7 @@ class Register extends React.Component<PropTypes, State> {
     const errorHandler = (err: any) => {
       toaster.notify('❌ Unable to register: ' + RequestError.parseError(err), {
         position: 'bottom-right',
-        duration: 2000
+        duration: 3000
       });
       this.setState({ processing: false });
     };

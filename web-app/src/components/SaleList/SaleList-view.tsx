@@ -10,11 +10,12 @@ interface Props {
   sales: Array<Sale>;
   loaded: boolean;
   role: string;
+  refresh: () => void;
 }
 
 export default class SaleList extends React.Component<Props> {
   render() {
-    const { sales, role, loaded } = this.props;
+    const { sales, role, loaded, refresh } = this.props;
     return (
       <div>
         <h2>{role === Seller.TYPE ? 'Sales' : 'Orders'}</h2>
@@ -23,7 +24,7 @@ export default class SaleList extends React.Component<Props> {
         ) : (
           <Row className="mt-4">
             <Col>
-              <UnconfirmedSaleCard sales={sales.filter(sale => !sale.confirmed)} role={role} />
+              <UnconfirmedSaleCard sales={sales.filter(sale => !sale.confirmed)} role={role} refresh={refresh} />
             </Col>
             <Col>
               <ConfirmedSaleCard sales={sales.filter(sale => sale.confirmed)} role={role} />

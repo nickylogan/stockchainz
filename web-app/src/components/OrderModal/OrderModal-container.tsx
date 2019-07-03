@@ -38,14 +38,14 @@ export default class OrderModal extends React.Component<Props, State> {
       .then(_ => {
         toaster.notify('✔ Successfully placed order', {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleSuccess) handleSuccess();
       })
       .catch(err => {
         toaster.notify('❌ Failed to place order: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleError) handleError(err);
       })

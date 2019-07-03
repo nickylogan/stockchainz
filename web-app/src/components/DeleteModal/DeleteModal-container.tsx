@@ -34,14 +34,14 @@ export default class DeleteModal extends React.Component<Props, State> {
       .then(_ => {
         toaster.notify('✔ Successfully deleted item', {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleSuccess) handleSuccess();
       })
       .catch(err => {
         toaster.notify('❌ Failed to delete item: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleError) handleError(err);
       })

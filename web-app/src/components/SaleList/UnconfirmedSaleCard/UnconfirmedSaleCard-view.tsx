@@ -7,11 +7,12 @@ import * as _ from 'underscore.string';
 interface Props {
   role: string;
   sales: Array<Sale>;
+  refresh: () => void;
 }
 
 export default class UnconfirmedSaleCard extends React.Component<Props> {
   render() {
-    const { role, sales } = this.props;
+    const { role, sales, refresh } = this.props;
     return (
       <Card border="secondary" className="mb-3">
         <Card.Header as="h5">Unconfirmed</Card.Header>
@@ -36,7 +37,7 @@ export default class UnconfirmedSaleCard extends React.Component<Props> {
                     <td>{sale.amount}</td>
                     {role === Seller.TYPE && (
                       <td>
-                        <ConfirmSaleButton sale={sale} />
+                        <ConfirmSaleButton sale={sale} handleSuccess={refresh} />
                       </td>
                     )}
                   </tr>

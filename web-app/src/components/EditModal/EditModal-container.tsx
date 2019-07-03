@@ -55,14 +55,14 @@ export default class EditModal extends React.Component<Props, State> {
       .then(_ => {
         toaster.notify('✔ Successfully updated item', {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleSuccess) handleSuccess();
       })
       .catch(err => {
         toaster.notify(`❌ Failed to update item: ` + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleError) handleError(err);
       })

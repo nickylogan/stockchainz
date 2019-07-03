@@ -33,14 +33,14 @@ export default class ConfirmSaleButton extends React.Component<Props, State> {
       .then(_ => {
         toaster.notify(`✔ Successfully confirmed sale #${sale.id}`, {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleSuccess) handleSuccess();
       })
       .catch(err => {
         toaster.notify(`❌ Failed to confirm sale: ` + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleError) handleError();
       })

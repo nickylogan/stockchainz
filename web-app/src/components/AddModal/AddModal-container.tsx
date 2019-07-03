@@ -54,7 +54,7 @@ export default class AddModal extends React.Component<Props, State> {
       .then(_ => {
         toaster.notify('✔ Successfully created item', {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleSuccess) handleSuccess();
       })
@@ -62,7 +62,7 @@ export default class AddModal extends React.Component<Props, State> {
         console.log(err);
         toaster.notify('❌ Failed to create item: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (handleError) handleError(err);
       })

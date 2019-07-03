@@ -35,7 +35,7 @@ export default class App extends React.Component<Props, AppState> {
       console.log(err);
       toaster.notify('❌ Error in checking session: ' + RequestError.parseError(err), {
         position: 'bottom-right',
-        duration: 2000
+        duration: 3000
       });
     }
   }
@@ -58,7 +58,7 @@ export default class App extends React.Component<Props, AppState> {
       .catch(err => {
         toaster.notify('❌ Unable to register: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
         if (errorCallback) errorCallback(err);
       });
@@ -72,7 +72,7 @@ export default class App extends React.Component<Props, AppState> {
       .catch(err => {
         toaster.notify('❌ Error in signing out: ' + RequestError.parseError(err), {
           position: 'bottom-right',
-          duration: 2000
+          duration: 3000
         });
       });
   }
