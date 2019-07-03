@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/market1-app/static/css/main.6fe004e0.chunk.css",
+    "main.js": "/market1-app/static/js/main.df7fb9f3.chunk.js",
+    "main.js.map": "/market1-app/static/js/main.df7fb9f3.chunk.js.map",
+    "runtime~main.js": "/market1-app/static/js/runtime~main.919ea230.js",
+    "runtime~main.js.map": "/market1-app/static/js/runtime~main.919ea230.js.map",
+    "static/css/2.dc646829.chunk.css": "/market1-app/static/css/2.dc646829.chunk.css",
+    "static/js/2.7870c61a.chunk.js": "/market1-app/static/js/2.7870c61a.chunk.js",
+    "static/js/2.7870c61a.chunk.js.map": "/market1-app/static/js/2.7870c61a.chunk.js.map",
+    "index.html": "/market1-app/index.html",
+    "precache-manifest.67c81e4a3a51cdd4ba7eaf47678302be.js": "/market1-app/precache-manifest.67c81e4a3a51cdd4ba7eaf47678302be.js",
+    "service-worker.js": "/market1-app/service-worker.js",
+    "static/css/2.dc646829.chunk.css.map": "/market1-app/static/css/2.dc646829.chunk.css.map",
+    "static/css/main.6fe004e0.chunk.css.map": "/market1-app/static/css/main.6fe004e0.chunk.css.map"
+  }
+}
