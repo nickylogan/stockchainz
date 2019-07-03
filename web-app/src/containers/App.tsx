@@ -5,22 +5,27 @@ import Dashboard from 'components/Dashboard';
 import Signin from 'components/Signin';
 import Register from 'components/Register';
 
-import toaster from 'toasted-notes';
 import 'toasted-notes/src/styles.css';
 import './App.css';
+import toaster from 'toasted-notes';
 import { Participant, Session, RequestError } from 'utils/types';
 import AppLoader from 'components/AppLoader';
+import Disconnected from 'components/Disconnected';
+import NotFound from 'components/NotFound';
 
 interface Props {}
 
 export interface AppState {
   session?: Session;
+  disconnected: boolean;
 }
 
 export default class App extends React.Component<Props, AppState> {
   constructor(props: Props) {
     super(props);
-    this.state = {};
+    this.state = {
+      disconnected: false
+    };
 
     this.handleSignin = this.handleSignin.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
@@ -32,11 +37,8 @@ export default class App extends React.Component<Props, AppState> {
       const session = await Participant.requestSession();
       this.handleSignin(session);
     } catch (err) {
+      this.setState({ disconnected: true });
       console.log(err);
-      toaster.notify('❌ Error in checking session: ' + RequestError.parseError(err), {
-        position: 'bottom-right',
-        duration: 3000
-      });
     }
   }
 
@@ -78,20 +80,21 @@ export default class App extends React.Component<Props, AppState> {
   }
 
   render() {
-    const { session } = this.state;
+    const { session, disconnected } = this.state;
+    if (disconnected) {
+      return <Disconnected />;
+    }
     if (!session) {
       return <AppLoader />;
     }
     return (
       <Switch>
         <Route
-          key="landing"
           path="/signin"
           exact={true}
           render={props => <Signin {...props} session={session} />}
         />
         <Route
-          key="register"
           path="/register"
           exact={true}
           render={props => (
@@ -99,13 +102,13 @@ export default class App extends React.Component<Props, AppState> {
           )}
         />
         <Route
-          key="index"
           path="/"
           exact={true}
           render={props => (
             <Dashboard {...props} session={session} handleSignout={this.handleSignout} />
           )}
         />
+        <Route exact={false} render={props => <NotFound {...props} />} />
       </Switch>
     );
   }
