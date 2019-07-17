@@ -181,8 +181,8 @@ describe('(TC-1 - TC-6) Item & Inventory', () => {
             should.exist(item);
         });
 
-        it('(TC-2) can be read by a non-seller', async () => {
-            await businessNetworkConnection.connect(buyerCardName);
+        it('(TC-2) can be read by the non-owning seller', async () => {
+            await businessNetworkConnection.connect(otherSellerCardName);
     
             // Create transaction
             const itemRegistry = await businessNetworkConnection.getAssetRegistry(NS_ITEM);
@@ -190,8 +190,8 @@ describe('(TC-1 - TC-6) Item & Inventory', () => {
             should.exist(item);
         });
 
-        it('(TC-3) can be read by the non-owning seller', async () => {
-            await businessNetworkConnection.connect(otherSellerCardName);
+        it('(TC-3) can be read by a non-seller', async () => {
+            await businessNetworkConnection.connect(buyerCardName);
     
             // Create transaction
             const itemRegistry = await businessNetworkConnection.getAssetRegistry(NS_ITEM);
@@ -210,17 +210,17 @@ describe('(TC-1 - TC-6) Item & Inventory', () => {
             should.exist(inv);
         });
 
-        it('(TC-5) cannot be read by a non-seller', async () => {
-            await businessNetworkConnection.connect(buyerCardName);
-    
+        it('(TC-5) cannot be read by the non-owning seller', async () => {
+            await businessNetworkConnection.connect(otherSellerCardName);
+            
             // Create transaction
             const invRegistry = await businessNetworkConnection.getAssetRegistry(NS_INV);
             return invRegistry.get('INV_IT_1234').should.be.rejected;
         });
 
-        it('(TC-6) cannot be read by the non-owning seller', async () => {
-            await businessNetworkConnection.connect(otherSellerCardName);
-    
+        it('(TC-6) cannot be read by a non-seller', async () => {
+            await businessNetworkConnection.connect(buyerCardName);
+
             // Create transaction
             const invRegistry = await businessNetworkConnection.getAssetRegistry(NS_INV);
             return invRegistry.get('INV_IT_1234').should.be.rejected;

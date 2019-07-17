@@ -35,7 +35,7 @@ services:
       COMPOSER_NAMESPACES: never
       COMPOSER_AUTHENTICATION: 'true'
       COMPOSER_MULTIUSER: 'true'
-      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID1","clientSecret":"$GOOGLE_OAUTH_SECRET1","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL","failureRedirect":"/"}}'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID1","clientSecret":"$GOOGLE_OAUTH_SECRET1","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL1","failureRedirect":"$FAILURE_REDIRECT_URL1"}}'
       COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market1.com"}}'
       GRPC_VERBOSITY: 'DEBUG'
     volumes: 
@@ -76,7 +76,7 @@ services:
       COMPOSER_NAMESPACES: never
       COMPOSER_AUTHENTICATION: 'true'
       COMPOSER_MULTIUSER: 'true'
-      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID2","clientSecret":"$GOOGLE_OAUTH_SECRET2","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL","failureRedirect":"/"}}'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID2","clientSecret":"$GOOGLE_OAUTH_SECRET2","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL2","failureRedirect":"$FAILURE_REDIRECT_URL2"}}'
       COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market2.com"}}'
       GRPC_VERBOSITY: 'DEBUG'
     volumes: 
@@ -117,7 +117,7 @@ services:
       COMPOSER_NAMESPACES: never
       COMPOSER_AUTHENTICATION: 'true'
       COMPOSER_MULTIUSER: 'true'
-      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID3","clientSecret":"$GOOGLE_OAUTH_SECRET3","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL","failureRedirect":"/"}}'
+      COMPOSER_PROVIDERS: '{"google":{"provider":"google","module":"passport-google-oauth2","clientID":"$GOOGLE_OAUTH_CLIENTID3","clientSecret":"$GOOGLE_OAUTH_SECRET3","authPath":"/auth/google","callbackURL":"/auth/google/callback","scope":"https://www.googleapis.com/auth/plus.login","successRedirect":"$SUCCESS_REDIRECT_URL3","failureRedirect":"$FAILURE_REDIRECT_URL3"}}'
       COMPOSER_DATASOURCE: '{"db":{"name":"db","connector":"mongodb","host":"mongo.api.market3.com"}}'
       GRPC_VERBOSITY: 'DEBUG'
     volumes: 

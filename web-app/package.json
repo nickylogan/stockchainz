@@ -10,6 +10,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "axios": "^0.19.0",
     "dotenv": "^8.0.0",
+    "gh-pages": "^2.0.1",    
     "js-cookie": "^2.2.0",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.8",
@@ -24,9 +25,11 @@
     "uuidv4": "^4.0.0",
     "ws": "^7.0.1"
   },
+  "homepage": "https://stockchainz.github.io/market1-app",
   "scripts": {
     "start": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling react-scripts start",
     "build": "react-scripts build",
+    "deploy": "gh-pages -d build -r https://github.com/stockchainz/market1-app",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

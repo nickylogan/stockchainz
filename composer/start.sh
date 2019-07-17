@@ -6,5 +6,9 @@ if [ $? -eq 0 ]; then
     ./businessnet-mgr.sh start && \
     ./businessnet-mgr.sh import && \
     ./rest-mgr.sh start
+
+    if [ $? -eq 0]; then
+        echo "@@@@@ SET UP FINISHED @@@@@"
+    fi
 fi
 

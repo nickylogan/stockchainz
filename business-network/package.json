@@ -8,7 +8,7 @@
   "scripts": {
     "archive": "mkdir -p ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/stockchainz.bna",
     "lint": "eslint .",
-    "test": "nyc mocha -t 0 test/index.test.js -s 200"
+    "test": "nyc mocha -t 0 test/index.test.js -s 4000"
   },
   "keywords": [
     "composer",
